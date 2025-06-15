@@ -22,6 +22,7 @@ model Genre {
 
 model Movie {
   id             Int      @id @default(autoincrement())
+  uniqueCode     String   @unique // Código único de 8 dígitos
   title          String
   originalTitle  String?
   overview       String?

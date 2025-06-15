@@ -30,6 +30,7 @@ const filmeSchema = z.object({
   coverUrl: z.string().url('URL da capa inválida'),
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.coerce.number().min(0).max(10).optional(),
+  uniqueCode: z.string().min(1, 'Código único obrigatório'),
 });
 
 interface Genre {
@@ -50,6 +51,7 @@ export default function EditarFilme() {
     coverUrl: '',
     productionInfo: '',
     rating: '',
+    uniqueCode: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -97,6 +99,7 @@ export default function EditarFilme() {
         coverUrl: movie.coverUrl,
         productionInfo: movie.productionInfo,
         rating: movie.rating?.toString() || '',
+        uniqueCode: movie.uniqueCode,
       });
 
       // Se o filme tem gêneros, seleciona o primeiro
@@ -239,7 +242,15 @@ export default function EditarFilme() {
                     <div className="p-2 rounded-lg bg-zinc-800 border border-zinc-700">
                       <InfoIcon className="h-5 w-5 text-zinc-400" />
                     </div>
-                    <h2 className="text-lg font-semibold text-white">Informações Básicas</h2>
+                    <div className="flex-1">
+                      <h2 className="text-lg font-semibold text-white">Informações Básicas</h2>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-zinc-400">Código:</p>
+                      <div className="px-2 py-1 bg-zinc-800 rounded border border-zinc-700">
+                        <code className="text-sm font-mono text-zinc-300">{form.uniqueCode}</code>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="grid gap-6">

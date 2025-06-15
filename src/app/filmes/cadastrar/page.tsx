@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookmarkIcon, FilmIcon, InfoIcon, Star } from 'lucide-react';
+import { ArrowLeft, BookmarkIcon, FilmIcon, InfoIcon, RefreshCw, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -53,9 +53,12 @@ export default function CadastrarFilme() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState('');
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [uniqueCode, setUniqueCode] = useState<string>('');
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
 
   useEffect(() => {
     fetchGenres();
+    generateNewCode();
   }, []);
 
   const fetchGenres = async () => {
@@ -69,6 +72,23 @@ export default function CadastrarFilme() {
     } catch (error) {
       console.error(error);
       toast.error('Erro ao buscar gêneros');
+    }
+  };
+
+  const generateNewCode = async () => {
+    try {
+      setIsGeneratingCode(true);
+      const response = await fetch('/api/filmes/generate-code');
+      if (!response.ok) {
+        throw new Error('Erro ao gerar código');
+      }
+      const data = await response.json();
+      setUniqueCode(data.uniqueCode);
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao gerar código único');
+    } finally {
+      setIsGeneratingCode(false);
     }
   };
 
@@ -93,12 +113,18 @@ export default function CadastrarFilme() {
         return;
       }
 
+      if (!uniqueCode) {
+        setError('Código único não gerado');
+        return;
+      }
+
       const res = await fetch('/api/filmes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...parsed.data,
           genreId: parseInt(selectedGenre),
+          uniqueCode,
         }),
       });
 
@@ -188,7 +214,25 @@ export default function CadastrarFilme() {
                     <div className="p-2 rounded-lg bg-zinc-800 border border-zinc-700">
                       <InfoIcon className="h-5 w-5 text-zinc-400" />
                     </div>
-                    <h2 className="text-lg font-semibold text-white">Informações Básicas</h2>
+                    <div className="flex-1">
+                      <h2 className="text-lg font-semibold text-white">Informações Básicas</h2>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-zinc-400">Código:</p>
+                      <div className="px-2 py-1 bg-zinc-800 rounded border border-zinc-700 flex items-center gap-2">
+                        <code className="text-sm font-mono text-zinc-300">{uniqueCode || '--------'}</code>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 hover:bg-zinc-700"
+                          onClick={generateNewCode}
+                          disabled={isGeneratingCode}
+                        >
+                          <RefreshCw className={`h-4 w-4 text-zinc-400 ${isGeneratingCode ? 'animate-spin' : ''}`} />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="grid gap-6">

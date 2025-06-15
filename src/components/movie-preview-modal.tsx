@@ -1,18 +1,28 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
-import { type Movie } from "@/generated/prisma/client";
 import { Eye, FilmIcon, FolderIcon, Star } from "lucide-react";
 
 interface MoviePreviewModalProps {
-  movie: Movie & {
+  movie: {
+    id: number;
+    uniqueCode: string;
+    title: string;
+    originalTitle: string | null;
+    overview: string | null;
+    year: number;
+    mediaType: string;
+    shelfCode: string;
+    coverUrl: string;
+    productionInfo: string;
+    rating: number | null;
     genres?: {
       id: number;
       name: string;
@@ -115,6 +125,14 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
               </h4>
               <p className="text-sm text-zinc-400">{movie.productionInfo}</p>
             </div>
+
+            {movie.uniqueCode && (
+              <div className="mt-2 px-2 py-1 bg-zinc-800 rounded border border-zinc-700 inline-block">
+                <p className="text-sm font-mono text-zinc-400">
+                  Código: {movie.uniqueCode}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

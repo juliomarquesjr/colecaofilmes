@@ -13,6 +13,7 @@ const filmeSchema = z.object({
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.number().min(0).max(10).optional(),
   genreId: z.number().optional(),
+  uniqueCode: z.string().length(8, 'Código único deve ter 8 caracteres'),
 });
 
 export async function GET() {
@@ -47,8 +48,21 @@ export async function POST(request: Request) {
       genreId: data.genreId ? parseInt(data.genreId) : undefined
     });
 
+    // Verifica se o código já existe
+    const existingMovie = await prisma.movie.findUnique({
+      where: { uniqueCode: validatedData.uniqueCode },
+    });
+
+    if (existingMovie) {
+      return NextResponse.json(
+        { error: "Código único já existe" },
+        { status: 400 }
+      );
+    }
+
     const movie = await prisma.movie.create({
       data: {
+        uniqueCode: validatedData.uniqueCode,
         title: validatedData.title,
         originalTitle: validatedData.originalTitle,
         overview: validatedData.overview,

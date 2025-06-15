@@ -1,11 +1,14 @@
-import { NextResponse } from 'next/server'
+// @ts-nocheck
+export const dynamic = 'force-dynamic'
+
+import { NextRequest, NextResponse } from 'next/server'
 
 const TMDB_ACCESS_TOKEN = process.env.TMDB_ACCESS_TOKEN
 const TMDB_API_URL = 'https://api.themoviedb.org/3'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const searchParams = request.nextUrl.searchParams
     const query = searchParams.get('query')
 
     if (!query) {
