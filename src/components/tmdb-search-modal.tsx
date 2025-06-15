@@ -4,12 +4,12 @@ import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from './ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from './ui/dialog'
 import { Input } from './ui/input'
 
@@ -33,6 +33,7 @@ interface TMDBSearchModalProps {
     year: number
     coverUrl: string
     productionInfo: string
+    rating: number
   }) => void
 }
 
@@ -99,6 +100,7 @@ export function TMDBSearchModal({ onMovieSelect }: TMDBSearchModalProps) {
       year,
       coverUrl,
       productionInfo: `Produzido em: ${productionCountries}`,
+      rating: movie.vote_average,
     })
     
     setOpen(false)

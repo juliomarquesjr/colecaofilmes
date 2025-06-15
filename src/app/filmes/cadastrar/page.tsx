@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookmarkIcon, FilmIcon, ImageIcon, InfoIcon } from 'lucide-react';
+import { ArrowLeft, BookmarkIcon, FilmIcon, InfoIcon, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -28,6 +28,7 @@ const filmeSchema = z.object({
   shelfCode: z.string().min(1, 'Código da estante obrigatório'),
   coverUrl: z.string().url('URL da capa inválida'),
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
+  rating: z.coerce.number().min(0).max(10).optional(),
 });
 
 interface Genre {
@@ -46,6 +47,7 @@ export default function CadastrarFilme() {
     shelfCode: '',
     coverUrl: '',
     productionInfo: '',
+    rating: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +72,7 @@ export default function CadastrarFilme() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -86,7 +88,12 @@ export default function CadastrarFilme() {
         return;
       }
 
-      const res = await fetch('http://localhost:3000/api/filmes', {
+      if (!selectedGenre) {
+        setError('Selecione um gênero');
+        return;
+      }
+
+      const res = await fetch('/api/filmes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -116,6 +123,7 @@ export default function CadastrarFilme() {
     year: number;
     coverUrl: string;
     productionInfo: string;
+    rating: number;
   }) => {
     setForm({
       ...form,
@@ -125,6 +133,7 @@ export default function CadastrarFilme() {
       year: movieData.year.toString(),
       coverUrl: movieData.coverUrl,
       productionInfo: movieData.productionInfo,
+      rating: movieData.rating.toString(),
     });
     toast.success('Informações do filme preenchidas!');
   };
@@ -250,7 +259,7 @@ export default function CadastrarFilme() {
                           value={form.year}
                           onChange={handleChange}
                           className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                          placeholder="Ex: 2024"
+                          placeholder="Digite o ano"
                         />
                       </div>
 
@@ -287,18 +296,7 @@ export default function CadastrarFilme() {
                         placeholder="Diretor, produtora, elenco principal..."
                       />
                     </div>
-                  </div>
-                </div>
 
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-lg bg-zinc-800 border border-zinc-700">
-                      <ImageIcon className="h-5 w-5 text-zinc-400" />
-                    </div>
-                    <h2 className="text-lg font-semibold text-white">Localização e Capa</h2>
-                  </div>
-
-                  <div className="grid gap-6">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="shelfCode" className="text-zinc-300">
@@ -310,88 +308,89 @@ export default function CadastrarFilme() {
                           value={form.shelfCode}
                           onChange={handleChange}
                           className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                          placeholder="Ex: A1, B2, C3"
+                          placeholder="Digite o código"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="genre" className="text-zinc-300">
-                          Gênero
+                        <Label htmlFor="rating" className="text-zinc-300">
+                          Nota
                         </Label>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <Select 
-                              value={selectedGenre} 
-                              onValueChange={setSelectedGenre}
-                            >
-                              <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
-                                <SelectValue placeholder="Selecione o gênero" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-zinc-800 border-zinc-700">
-                                {genres.map((genre) => (
-                                  <SelectItem 
-                                    key={genre.id} 
-                                    value={genre.id}
-                                    className="text-zinc-100 focus:bg-zinc-700"
-                                  >
-                                    {genre.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <GenreModal onGenreAdded={fetchGenres} />
-                        </div>
+                        <Input
+                          id="rating"
+                          name="rating"
+                          type="number"
+                          min="0"
+                          max="10"
+                          step="0.1"
+                          value={form.rating}
+                          onChange={handleChange}
+                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                          placeholder="Digite a nota (0-10)"
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="coverUrl" className="text-zinc-300">
-                        URL da Capa
+                      <Label htmlFor="genre" className="text-zinc-300">
+                        Gênero
                       </Label>
-                      <Input
-                        id="coverUrl"
-                        name="coverUrl"
-                        value={form.coverUrl}
-                        onChange={handleChange}
-                        className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                        placeholder="https://exemplo.com/imagem.jpg"
-                      />
-                      <p className="text-xs text-zinc-500">
-                        Cole aqui o link da imagem da capa do filme
-                      </p>
+                      <div className="flex gap-2">
+                        <div className="flex-1">
+                          <Select 
+                            value={selectedGenre} 
+                            onValueChange={setSelectedGenre}
+                          >
+                            <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
+                              <SelectValue placeholder="Selecione o gênero" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                              {genres.map((genre) => (
+                                <SelectItem 
+                                  key={genre.id} 
+                                  value={genre.id}
+                                  className="text-zinc-100 focus:bg-zinc-700"
+                                >
+                                  {genre.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <GenreModal onGenreAdded={fetchGenres} />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-6 bg-zinc-900/50 rounded-b-lg">
+                <div className="p-6 border-t border-zinc-800">
                   <div className="flex items-center justify-end gap-4">
                     <Link href="/filmes">
-                      <Button
+                      <Button 
+                        variant="ghost" 
                         type="button"
-                        variant="ghost"
-                        className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100"
-                        disabled={isLoading}
+                        className="bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-800"
                       >
                         Cancelar
                       </Button>
                     </Link>
-                    <Button
-                      type="submit"
+                    <Button 
+                      type="submit" 
                       disabled={isLoading}
-                      className="bg-indigo-950 hover:bg-indigo-900 text-indigo-100 border border-indigo-800 min-w-[100px]"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white"
                     >
-                      {isLoading ? 'Salvando...' : 'Salvar'}
+                      {isLoading ? 'Salvando...' : 'Cadastrar'}
                     </Button>
                   </div>
                 </div>
               </form>
             </div>
 
+            {/* Preview */}
             <div className="hidden lg:block">
               <div className="bg-zinc-900 rounded-lg border border-zinc-800 p-6 sticky top-8">
                 <h3 className="text-lg font-semibold text-white mb-4">Preview do Filme</h3>
-                <div className="aspect-[2/3] bg-zinc-800 rounded-lg border border-zinc-700 mb-4">
+                <div className="aspect-[2/3] bg-zinc-800 rounded-lg border border-zinc-700 mb-4 relative">
                   {form.coverUrl ? (
                     <img
                       src={form.coverUrl}
@@ -401,6 +400,14 @@ export default function CadastrarFilme() {
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <FilmIcon className="h-12 w-12 text-zinc-700" />
+                    </div>
+                  )}
+                  {form.rating && (
+                    <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded bg-black/60">
+                      <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                      <span className="text-sm font-medium text-yellow-500">
+                        {parseFloat(form.rating).toFixed(1)}
+                      </span>
                     </div>
                   )}
                 </div>
