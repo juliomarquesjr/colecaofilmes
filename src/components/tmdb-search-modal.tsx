@@ -21,8 +21,11 @@ interface TMDBMovie {
   release_date: string
   poster_path: string | null
   production_countries?: { iso_3166_1: string; name: string }[]
+  origin_country?: string[]
   vote_average: number
   genres: { id: number; name: string }[]
+  runtime?: number | null
+  original_language?: string
 }
 
 interface TMDBSearchModalProps {
@@ -34,6 +37,10 @@ interface TMDBSearchModalProps {
     coverUrl: string
     productionInfo: string
     rating: number
+    runtime?: number | null
+    country?: string | null
+    countryFlag?: string | null
+    originalLanguage?: string | null
   }) => void
 }
 
@@ -86,27 +93,84 @@ export function TMDBSearchModal({ onMovieSelect }: TMDBSearchModalProps) {
     searchMovies(value)
   }
 
-  const handleMovieSelect = (movie: TMDBMovie) => {
-    const year = movie.release_date ? parseInt(movie.release_date.split('-')[0]) : 0
-    const coverUrl = movie.poster_path
-      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-      : ''
-    const productionCountries = movie.production_countries?.map(country => country.name).join(', ') || 'País não informado'
-    
-    onMovieSelect({
-      title: movie.title,
-      originalTitle: movie.original_title,
-      overview: movie.overview || '',
-      year,
-      coverUrl,
-      productionInfo: `Produzido em: ${productionCountries}`,
-      rating: movie.vote_average,
-    })
-    
-    setOpen(false)
-    setSearchTerm('')
-    setMovies([])
-  }
+  const handleMovieSelect = async (movie: TMDBMovie) => {
+    try {
+      // Buscar detalhes adicionais do filme
+      const detailsRes = await fetch(`/api/tmdb/movie/${movie.id}`);
+      if (!detailsRes.ok) throw new Error(`Erro ao buscar detalhes do filme ${movie.id}`);
+      
+      const details = await detailsRes.json();
+      console.log(`Detalhes completos do filme ${movie.id}:`, {
+        runtime: details.runtime,
+        original_language: details.original_language,
+        production_countries: details.production_countries,
+        origin_country: details.origin_country
+      });
+
+      // Função para obter a bandeira do país
+      const getCountryFlag = (countryCode: string) => {
+        // Converte o código do país para regional indicator symbols
+        // Exemplo: 'US' -> '🇺🇸'
+        const offset = 127397; // Offset para converter ASCII para regional indicator symbols
+        const flag = countryCode
+          .toUpperCase()
+          .split('')
+          .map(char => String.fromCodePoint(char.charCodeAt(0) + offset))
+          .join('');
+        return flag;
+      };
+
+      // Obter o idioma original formatado
+      const getLanguageName = (languageCode: string) => {
+        const languageNames: { [key: string]: string } = {
+          'en': 'Inglês',
+          'es': 'Espanhol',
+          'pt': 'Português',
+          'fr': 'Francês',
+          'de': 'Alemão',
+          'it': 'Italiano',
+          'ja': 'Japonês',
+          'ko': 'Coreano',
+          'zh': 'Chinês',
+          'ru': 'Russo'
+        }
+        return languageNames[languageCode] || languageCode.toUpperCase()
+      }
+
+      const year = movie.release_date ? parseInt(movie.release_date.split('-')[0]) : 0;
+      const coverUrl = movie.poster_path
+        ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+        : '';
+
+      // Processar países de origem
+      const originCountry = details.origin_country?.[0] || details.production_countries?.[0]?.iso_3166_1;
+      const countryFlag = originCountry ? getCountryFlag(originCountry) : null;
+      const countryName = details.production_countries?.[0]?.name || 'País não informado';
+      
+      const productionCountries = details.production_countries?.map((country: { name: string }) => country.name).join(', ') || 'País não informado';
+      
+      onMovieSelect({
+        title: movie.title,
+        originalTitle: movie.original_title,
+        overview: movie.overview || '',
+        year,
+        coverUrl,
+        productionInfo: `Produzido em: ${productionCountries}`,
+        rating: movie.vote_average,
+        runtime: details.runtime || null,
+        country: countryName,
+        countryFlag,
+        originalLanguage: details.original_language ? getLanguageName(details.original_language) : null,
+      });
+      
+      setOpen(false);
+      setSearchTerm('');
+      setMovies([]);
+    } catch (error) {
+      console.error('Erro ao buscar detalhes do filme:', error);
+      toast.error('Erro ao buscar detalhes adicionais do filme');
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -196,6 +260,11 @@ export function TMDBSearchModal({ onMovieSelect }: TMDBSearchModalProps) {
                         <span className="text-zinc-400">
                           {movie.release_date ? movie.release_date.split('-')[0] : 'Ano não informado'}
                         </span>
+                        {movie.runtime && (
+                          <span className="text-zinc-400">
+                            • {movie.runtime} min
+                          </span>
+                        )}
                         {movie.production_countries && movie.production_countries.length > 0 && (
                           <span className="text-zinc-500 line-clamp-1">
                             • {movie.production_countries[0].name}

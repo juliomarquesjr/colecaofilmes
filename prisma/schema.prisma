@@ -33,6 +33,10 @@ model Movie {
   productionInfo String
   rating         Float?   // Nota do filme (0-10)
   trailerUrl     String?  // URL do trailer do YouTube
+  runtime        Int?     // Duração em minutos
+  country        String   // País de origem
+  countryFlag    String?  // Emoji da bandeira do país
+  originalLanguage String // Idioma original
   genres         Genre[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

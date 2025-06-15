@@ -34,7 +34,11 @@ const filmeSchema = z.object({
   coverUrl: z.string().url('URL da capa inválida'),
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.coerce.number().min(0).max(10).optional(),
-  trailerUrl: z.string().url('URL do trailer inválido').optional(),
+  trailerUrl: z.string().url('URL do trailer inválido').optional().or(z.literal('')).or(z.undefined()),
+  runtime: z.coerce.number().int().min(1, 'Duração inválida').optional(),
+  country: z.string().min(1, 'País de origem obrigatório'),
+  countryFlag: z.string().optional(),
+  originalLanguage: z.string().min(1, 'Idioma original obrigatório'),
 });
 
 interface Genre {
@@ -55,6 +59,10 @@ export default function CadastrarFilme() {
     productionInfo: '',
     rating: '',
     trailerUrl: '',
+    runtime: '',
+    country: '',
+    countryFlag: '',
+    originalLanguage: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -110,7 +118,12 @@ export default function CadastrarFilme() {
     setIsLoading(true);
 
     try {
-      const parsed = filmeSchema.safeParse(form);
+      const formData = {
+        ...form,
+        trailerUrl: form.trailerUrl || undefined
+      };
+
+      const parsed = filmeSchema.safeParse(formData);
       if (!parsed.success) {
         setError(parsed.error.errors[0].message);
         return;
@@ -126,14 +139,20 @@ export default function CadastrarFilme() {
         return;
       }
 
+      const dataToSend = {
+        ...parsed.data,
+        genreId: parseInt(selectedGenre),
+        uniqueCode,
+      };
+
+      if (!dataToSend.trailerUrl) {
+        delete dataToSend.trailerUrl;
+      }
+
       const res = await fetch('/api/filmes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...parsed.data,
-          genreId: parseInt(selectedGenre),
-          uniqueCode,
-        }),
+        body: JSON.stringify(dataToSend),
       });
 
       if (!res.ok) {
@@ -158,6 +177,10 @@ export default function CadastrarFilme() {
     coverUrl: string;
     productionInfo: string;
     rating: number;
+    runtime?: number | null;
+    country?: string | null;
+    countryFlag?: string | null;
+    originalLanguage?: string | null;
   }) => {
     setForm({
       ...form,
@@ -168,6 +191,10 @@ export default function CadastrarFilme() {
       coverUrl: movieData.coverUrl,
       productionInfo: movieData.productionInfo,
       rating: movieData.rating.toString(),
+      runtime: movieData.runtime?.toString() || '',
+      country: movieData.country || '',
+      countryFlag: movieData.countryFlag || '',
+      originalLanguage: movieData.originalLanguage || '',
     });
     toast.success('Informações do filme preenchidas!');
   };
@@ -438,6 +465,58 @@ export default function CadastrarFilme() {
                           </div>
                           <GenreModal onGenreAdded={fetchGenres} />
                         </div>
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="runtime" className="text-zinc-300">
+                            Duração (minutos)
+                          </Label>
+                          <Input
+                            id="runtime"
+                            name="runtime"
+                            type="number"
+                            value={form.runtime}
+                            onChange={handleChange}
+                            className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                            placeholder="Ex: 120"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="country" className="text-zinc-300">
+                            País de Origem
+                          </Label>
+                          <div className="relative">
+                            {form.countryFlag && (
+                              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-lg">
+                                {form.countryFlag}
+                              </div>
+                            )}
+                            <Input
+                              id="country"
+                              name="country"
+                              value={form.country}
+                              onChange={handleChange}
+                              className={`bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800 ${form.countryFlag ? 'pl-10' : ''}`}
+                              placeholder="Ex: Estados Unidos"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="originalLanguage" className="text-zinc-300">
+                          Idioma Original
+                        </Label>
+                        <Input
+                          id="originalLanguage"
+                          name="originalLanguage"
+                          value={form.originalLanguage}
+                          onChange={handleChange}
+                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                          placeholder="Ex: Inglês"
+                        />
                       </div>
                     </div>
                   </div>

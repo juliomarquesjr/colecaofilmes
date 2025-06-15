@@ -15,6 +15,10 @@ const filmeSchema = z.object({
   genreId: z.number().optional(),
   uniqueCode: z.string().length(8, 'Código único deve ter 8 caracteres'),
   trailerUrl: z.string().url('URL do trailer inválida').optional(),
+  runtime: z.number().int().min(1, 'Duração inválida').optional(),
+  country: z.string().min(1, 'País de origem obrigatório'),
+  countryFlag: z.string().optional(),
+  originalLanguage: z.string().min(1, 'Idioma original obrigatório'),
 });
 
 export async function GET() {
@@ -74,6 +78,10 @@ export async function POST(request: Request) {
         productionInfo: validatedData.productionInfo,
         rating: validatedData.rating,
         trailerUrl: validatedData.trailerUrl,
+        runtime: validatedData.runtime,
+        country: validatedData.country,
+        countryFlag: validatedData.countryFlag,
+        originalLanguage: validatedData.originalLanguage,
         genres: validatedData.genreId ? {
           connect: [{ id: validatedData.genreId }]
         } : undefined,
