@@ -1,5 +1,6 @@
 "use client"
 
+import { GenreManagementModal } from "@/components/genre-management-modal"
 import { MovieCard } from "@/components/movie-card"
 import { MovieFilters } from "@/components/movie-filters"
 import { Button } from "@/components/ui/button"
@@ -148,12 +149,18 @@ export default function FilmesPage() {
             <FilmIcon className="h-8 w-8" />
             Meus Filmes
           </h1>
-          <Link href="/filmes/cadastrar">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Adicionar Filme
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <GenreManagementModal
+              genres={genres}
+              onGenresChange={setGenres}
+            />
+            <Link href="/filmes/cadastrar">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar Filme
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Barra de Pesquisa e Filtros */}

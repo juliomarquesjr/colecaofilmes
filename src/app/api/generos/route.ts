@@ -3,20 +3,14 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 
 const genreSchema = z.object({
-  name: z.string().min(1, "Nome do gênero é obrigatório"),
+  name: z.string().min(1, "Nome é obrigatório"),
 })
 
 export async function GET() {
   try {
     const genres = await prisma.genre.findMany({
-      where: {
-        deletedAt: null,
-      },
-      orderBy: {
-        name: "asc",
-      },
+      orderBy: { name: "asc" },
     })
-
     return NextResponse.json(genres)
   } catch (error) {
     console.error("Erro ao buscar gêneros:", error)
@@ -31,42 +25,37 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { name } = genreSchema.parse(body)
+    const normalizedName = name.trim().toLowerCase()
 
-    // Verifica se já existe um gênero com o mesmo nome (case insensitive)
-    const normalizedName = name.toLowerCase()
-    const existingGenre = await prisma.genre.findFirst({
-      where: {
-        deletedAt: null,
-      },
-    })
+    // Busca todos os gêneros e faz a comparação case-insensitive manualmente
+    const allGenres = await prisma.genre.findMany()
+    const existingGenre = allGenres.find(
+      genre => genre.name.toLowerCase() === normalizedName
+    )
 
-    // Faz a comparação case insensitive manualmente
-    if (existingGenre && existingGenre.name.toLowerCase() === normalizedName) {
+    if (existingGenre) {
       return NextResponse.json(
-        { error: "Já existe um gênero com este nome" },
+        { error: "Já existe uma categoria com este nome" },
         { status: 400 }
       )
     }
 
     const genre = await prisma.genre.create({
-      data: {
-        name,
-      },
+      data: { name: name.trim() },
     })
 
     return NextResponse.json(genre)
   } catch (error) {
-    console.error("Erro ao cadastrar gênero:", error)
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Dados inválidos", details: error.errors },
+        { error: error.errors[0].message },
         { status: 400 }
       )
     }
 
+    console.error("Erro ao criar categoria:", error)
     return NextResponse.json(
-      { error: "Erro ao cadastrar gênero" },
+      { error: "Erro ao criar categoria" },
       { status: 500 }
     )
   }

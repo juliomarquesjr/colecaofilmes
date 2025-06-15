@@ -1,5 +1,6 @@
 {
-  "/api/generos/route": "app/api/generos/route.js",
-  "/api/filmes/route": "app/api/filmes/route.js",
-  "/filmes/page": "app/filmes/page.js"
+  "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
+  "/filmes/page": "app/filmes/page.js",
+  "/api/generos/[id]/route": "app/api/generos/[id]/route.js",
+  "/api/generos/route": "app/api/generos/route.js"
 }
