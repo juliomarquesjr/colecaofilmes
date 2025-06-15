@@ -32,18 +32,16 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { name } = genreSchema.parse(body)
 
-    // Verifica se já existe um gênero com o mesmo nome
+    // Verifica se já existe um gênero com o mesmo nome (case insensitive)
+    const normalizedName = name.toLowerCase()
     const existingGenre = await prisma.genre.findFirst({
       where: {
-        name: {
-          equals: name,
-          mode: "insensitive",
-        },
         deletedAt: null,
       },
     })
 
-    if (existingGenre) {
+    // Faz a comparação case insensitive manualmente
+    if (existingGenre && existingGenre.name.toLowerCase() === normalizedName) {
       return NextResponse.json(
         { error: "Já existe um gênero com este nome" },
         { status: 400 }

@@ -3,12 +3,12 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from './ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from './ui/dialog'
 import { Input } from './ui/input'
 
@@ -23,7 +23,7 @@ interface TMDBMovie {
   original_title: string
   original_language: string
   popularity: number
-  production_countries: Array<{ iso_3166_1: string, name: string }>
+  production_countries?: Array<{ iso_3166_1: string, name: string }>
 }
 
 interface TMDBSearchModalProps {
@@ -85,7 +85,9 @@ export function TMDBSearchModal({ onMovieSelect }: TMDBSearchModalProps) {
     const productionInfo = [
       `Título Original: ${movie.original_title}`,
       `Idioma Original: ${movie.original_language.toUpperCase()}`,
-      `Países de Produção: ${movie.production_countries.map(c => c.name).join(', ')}`,
+      movie.production_countries?.length 
+        ? `Países de Produção: ${movie.production_countries.map(c => c.name).join(', ')}`
+        : null,
       `Popularidade: ${movie.popularity.toFixed(1)}`,
       movie.overview
     ].filter(Boolean).join('\n\n')
