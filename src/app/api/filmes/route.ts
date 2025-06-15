@@ -12,7 +12,7 @@ const filmeSchema = z.object({
   coverUrl: z.string().url('URL da capa inválida'),
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.number().min(0).max(10).optional(),
-  genreIds: z.array(z.number()).optional(),
+  genreId: z.number().optional(),
 });
 
 export async function GET() {
@@ -42,7 +42,10 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const validatedData = filmeSchema.parse(data);
+    const validatedData = filmeSchema.parse({
+      ...data,
+      genreId: data.genreId ? parseInt(data.genreId) : undefined
+    });
 
     const movie = await prisma.movie.create({
       data: {
@@ -55,8 +58,8 @@ export async function POST(request: Request) {
         coverUrl: validatedData.coverUrl,
         productionInfo: validatedData.productionInfo,
         rating: validatedData.rating,
-        genres: validatedData.genreIds ? {
-          connect: validatedData.genreIds.map(id => ({ id }))
+        genres: validatedData.genreId ? {
+          connect: [{ id: validatedData.genreId }]
         } : undefined,
       },
       include: {

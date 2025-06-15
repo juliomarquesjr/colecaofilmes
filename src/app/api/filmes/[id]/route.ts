@@ -18,7 +18,7 @@ const filmeSchema = z.object({
   coverUrl: z.string().url('URL da capa inválida'),
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.number().min(0).max(10).optional(),
-  genreId: z.string().optional(),
+  genreId: z.number().optional(),
 })
 
 export async function GET(request: Request, { params }: RouteParams) {
@@ -74,6 +74,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
         id,
         deletedAt: null 
       },
+      include: {
+        genres: true
+      }
     })
 
     if (!existingMovie) {
@@ -84,7 +87,10 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     const data = await request.json()
-    const validatedData = filmeSchema.parse(data)
+    const validatedData = filmeSchema.parse({
+      ...data,
+      genreId: data.genreId ? parseInt(data.genreId) : undefined
+    })
 
     // Atualiza o filme
     const movie = await prisma.movie.update({
@@ -99,14 +105,14 @@ export async function PUT(request: Request, { params }: RouteParams) {
         coverUrl: validatedData.coverUrl,
         productionInfo: validatedData.productionInfo,
         rating: validatedData.rating,
-        genres: validatedData.genreId ? {
+        genres: {
           set: [], // Remove todos os gêneros existentes
-          connect: [{ id: parseInt(validatedData.genreId) }] // Conecta o novo gênero
-        } : undefined,
+          connect: validatedData.genreId ? [{ id: validatedData.genreId }] : []
+        }
       },
       include: {
-        genres: true,
-      },
+        genres: true
+      }
     })
 
     return NextResponse.json(movie)

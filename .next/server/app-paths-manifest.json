@@ -1,10 +1,10 @@
 {
-  "/not-found": "app/not-found.js",
+  "/filmes/page": "app/filmes/page.js",
   "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
   "/filmes/[id]/editar/page": "app/filmes/[id]/editar/page.js",
-  "/filmes/page": "app/filmes/page.js",
+  "/api/generos/route": "app/api/generos/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/api/tmdb/search/route": "app/api/tmdb/search/route.js",
   "/api/filmes/route": "app/api/filmes/route.js",
-  "/api/generos/route": "app/api/generos/route.js",
   "/api/filmes/[id]/route": "app/api/filmes/[id]/route.js"
 }

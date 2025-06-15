@@ -33,7 +33,7 @@ const filmeSchema = z.object({
 });
 
 interface Genre {
-  id: string;
+  id: number;
   name: string;
 }
 
@@ -78,11 +78,15 @@ export default function EditarFilme() {
 
   const fetchMovie = async () => {
     try {
+      setIsLoadingMovie(true);
       const response = await fetch(`/api/filmes/${params.id}`);
       if (!response.ok) {
         throw new Error('Erro ao buscar filme');
       }
       const movie = await response.json();
+      
+      console.log('Movie data:', movie); // Debug
+
       setForm({
         title: movie.title,
         originalTitle: movie.originalTitle || '',
@@ -94,9 +98,13 @@ export default function EditarFilme() {
         productionInfo: movie.productionInfo,
         rating: movie.rating?.toString() || '',
       });
-      setSelectedGenre(movie.genreId || '');
+
+      // Se o filme tem gêneros, seleciona o primeiro
+      if (movie.genres && movie.genres.length > 0) {
+        setSelectedGenre(movie.genres[0].id.toString());
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Erro ao buscar filme:', error);
       toast.error('Erro ao buscar filme');
       router.push('/filmes');
     } finally {
@@ -130,7 +138,7 @@ export default function EditarFilme() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...parsed.data,
-          genreId: selectedGenre,
+          genreId: parseInt(selectedGenre),
         }),
       });
 
@@ -391,7 +399,7 @@ export default function EditarFilme() {
                               {genres.map((genre) => (
                                 <SelectItem 
                                   key={genre.id} 
-                                  value={genre.id}
+                                  value={genre.id.toString()}
                                   className="text-zinc-100 focus:bg-zinc-700"
                                 >
                                   {genre.name}

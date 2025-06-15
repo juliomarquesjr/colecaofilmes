@@ -32,7 +32,7 @@ const filmeSchema = z.object({
 });
 
 interface Genre {
-  id: string;
+  id: number;
   name: string;
 }
 
@@ -98,7 +98,7 @@ export default function CadastrarFilme() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...parsed.data,
-          genreId: selectedGenre,
+          genreId: parseInt(selectedGenre),
         }),
       });
 
@@ -348,7 +348,7 @@ export default function CadastrarFilme() {
                               {genres.map((genre) => (
                                 <SelectItem 
                                   key={genre.id} 
-                                  value={genre.id}
+                                  value={genre.id.toString()}
                                   className="text-zinc-100 focus:bg-zinc-700"
                                 >
                                   {genre.name}
