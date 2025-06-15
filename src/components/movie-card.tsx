@@ -1,6 +1,5 @@
 'use client'
 
-import { MoviePreviewModal } from "@/components/movie-preview-modal"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,14 +12,12 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent
-} from "@/components/ui/card"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { type Movie } from "@/generated/prisma/client"
-import { Pencil, Star, Trash2 } from "lucide-react"
-import Image from "next/image"
+import { motion } from "framer-motion"
+import { FilmIcon, MoreVertical, Pencil, Star, Trash2, Youtube } from "lucide-react"
 import { useState } from "react"
+import { MoviePreviewModal } from "./movie-preview-modal"
 
 interface MovieCardProps {
   movie: Movie & {
@@ -38,94 +35,133 @@ export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   return (
-    <Card className="group relative overflow-hidden border-zinc-800 bg-zinc-900/50 transition-all hover:scale-[1.02] hover:border-zinc-700">
-      {/* Overlay com ações */}
-      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-black/60 opacity-0 backdrop-blur-[2px] transition-opacity group-hover:opacity-100">
-        <MoviePreviewModal movie={movie} />
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => onEdit(movie.id)}
-          className="h-8 w-32 border-zinc-700 bg-zinc-800/50 text-zinc-100 hover:bg-zinc-800 hover:text-white"
-        >
-          <Pencil className="mr-2 h-4 w-4" />
-          Editar
-        </Button>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => setShowDeleteDialog(true)}
-          className="h-8 w-32"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Excluir
-        </Button>
-      </div>
-
-      {/* Capa do Filme */}
-      <div className="relative aspect-[2/3] overflow-hidden">
-        <Image
-          src={movie.coverUrl || "/placeholder-cover.jpg"}
-          alt={movie.title}
-          fill
-          className="object-cover"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        />
-        
-        {/* Nota do filme */}
-        {movie.rating ? (
-          <div className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-amber-500 backdrop-blur-[2px]">
-            <Star className="h-3.5 w-3.5 fill-current" />
-            <span className="text-sm font-medium leading-none">
-              {movie.rating.toFixed(1)}
-            </span>
-          </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
+      className="group relative"
+    >
+      <motion.div
+        initial={{ scale: 0.95 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.2 }}
+        className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-800 border border-zinc-700"
+      >
+        {movie.coverUrl ? (
+          <motion.img
+            initial={{ scale: 1.2, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            src={movie.coverUrl}
+            alt={movie.title}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
         ) : (
-          <div className="absolute right-2 top-2 z-10 rounded-full bg-black/60 px-2 py-1 text-zinc-400 backdrop-blur-[2px]">
-            <span className="text-xs">Sem nota</span>
+          <div className="flex h-full items-center justify-center">
+            <FilmIcon className="h-12 w-12 text-zinc-500" />
           </div>
         )}
 
-        {/* Gradiente sobre a imagem */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-      </div>
+        {/* Overlay com ações */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100"
+        >
+          <div className="flex items-center gap-2">
+            <MoviePreviewModal movie={movie} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 w-8 border-zinc-700 bg-zinc-800/50 p-0 text-zinc-100 hover:bg-zinc-800 hover:text-white"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-40 bg-zinc-800 border-zinc-700 text-zinc-100"
+              >
+                <DropdownMenuItem
+                  onClick={() => onEdit(movie.id)}
+                  className="hover:bg-zinc-700 focus:bg-zinc-700 cursor-pointer"
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-red-400 hover:bg-red-950/50 hover:text-red-400 focus:bg-red-950/50 focus:text-red-400 cursor-pointer"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </motion.div>
 
-      {/* Informações do filme */}
-      <CardContent className="absolute bottom-0 left-0 right-0 z-10 bg-black/40 p-3 backdrop-blur-[2px]">
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <h3 className="line-clamp-1 font-medium text-zinc-50" title={movie.title}>
-              {movie.title}
-            </h3>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-zinc-300">
-            <span>{movie.year}</span>
-            <span>•</span>
-            <span>{movie.mediaType}</span>
-            <span>•</span>
-            <span>{movie.shelfCode}</span>
-          </div>
-          <div className="flex flex-wrap gap-1 pt-0.5">
-            {movie.genres?.slice(0, 2).map((genre) => (
+        {/* Badges */}
+        <div className="absolute left-2 right-2 top-2 flex flex-wrap items-center gap-1">
+          {movie.rating && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <Badge
-                key={genre.name}
-                variant="secondary"
-                className="bg-white/20 px-1.5 py-0.5 text-[10px] font-normal text-white hover:bg-white/30"
+                variant="outline"
+                className="bg-black/60 border-yellow-900/50 text-yellow-500 flex items-center gap-1"
               >
-                {genre.name}
+                <Star className="h-3 w-3 fill-yellow-500" />
+                {movie.rating.toFixed(1)}
               </Badge>
-            ))}
-            {movie.genres && movie.genres.length > 2 && (
+            </motion.div>
+          )}
+          {movie.trailerUrl && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               <Badge
-                variant="secondary"
-                className="bg-white/20 px-1.5 py-0.5 text-[10px] font-normal text-white hover:bg-white/30"
+                variant="outline"
+                className="bg-black/60 border-red-900/50 text-red-400 flex items-center gap-1"
               >
-                +{movie.genres.length - 2}
+                <Youtube className="h-3 w-3" />
+                Trailer
               </Badge>
-            )}
-          </div>
+            </motion.div>
+          )}
         </div>
-      </CardContent>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mt-2 space-y-1"
+      >
+        <h3 className="text-sm font-medium leading-tight text-zinc-100 line-clamp-1">
+          {movie.title}
+        </h3>
+        <div className="flex items-center gap-1 text-xs text-zinc-400">
+          <span>{movie.year}</span>
+          <span>•</span>
+          <span>{movie.mediaType}</span>
+          {movie.genres && movie.genres.length > 0 && (
+            <>
+              <span>•</span>
+              <span>{movie.genres[0].name}</span>
+            </>
+          )}
+        </div>
+      </motion.div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
@@ -149,6 +185,6 @@ export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Card>
+    </motion.div>
   )
 } 
