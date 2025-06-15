@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json()
+    console.log("Recebido:", data)
     
     // Filtra apenas os resultados com data de lançamento e título
     const filteredResults = data.results.filter((movie: any) => 
