@@ -1,0 +1,17 @@
+{
+  "project": "Catálogo de Filmes Pessoais",
+  "description": "Aplicativo de cadastro e gerenciamento interno de filmes para uso pessoal, com visual amigável e API integrada.",
+  "rulesDirectory": ".cursor/rules/",
+  "appliedRules": [
+    "contexto-obrigatorio.mdc",
+    "contexto-historico.mdc",
+    "commits-padronizados.mdc",
+    "documentacao-obrigatoria.mdc",
+    "verificacao-duplicacao-obrigatoria.mdc",
+    "validacao-e-tipagem.mdc",
+    "dados-reais-apenas.mdc",
+    "desenvolvimento-incremental.mdc",
+    "fases-desenvolvimento.mdc",
+    "database-protection.mdc"
+  ]
+}

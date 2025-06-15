@@ -1,0 +1,25 @@
+---
+description: Estruture o progresso do projeto em fases de entrega incremental.
+globs: ["**/*"]
+alwaysApply: true
+---
+
+Sugestão de fases:
+
+1. **MVP**:
+   - Cadastro de filme com título, ano, tipo e código da estante
+   - Listagem e visualização
+
+2. **Admin**:
+   - Autenticação e proteção de rotas
+   - CRUD completo
+
+3. **Visual e Estilo**:
+   - Adição de capa
+   - Interface com shadcn/ui
+
+4. **Pesquisa e Filtragem**:
+   - Busca por título, tipo e localização
+
+5. **API interna**:
+   - Endpoints documentados e reutilizáveis

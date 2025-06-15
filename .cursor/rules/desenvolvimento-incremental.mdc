@@ -1,0 +1,12 @@
+---
+description: As funcionalidades devem ser desenvolvidas em pequenas partes testáveis.
+globs: ["app/**/*", "lib/**/*"]
+alwaysApply: true
+---
+
+Prefira PRs menores e frequentes, que implementam partes funcionais:
+- Cadastro simples antes de adicionar edição e exclusão
+- Exibição da lista antes de criar filtro por categoria
+- Integração com autenticação antes de proteção de rotas
+
+Facilita o deploy contínuo e o rastreio de bugs.

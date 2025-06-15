@@ -1,0 +1,7 @@
+---
+description: Cada arquivo modificado deve manter o contexto histórico preservado, com cuidado para não sobrescrever lógicas existentes.
+globs: ["app/**/*", "lib/**/*", "pages/**/*", "prisma/**/*"]
+alwaysApply: true
+---
+
+Evite sobrescrever ou apagar lógicas existentes sem justificativa. Sempre que possível, preserve a estrutura anterior e documente mudanças relevantes, especialmente nos arquivos de rota, autenticação e manipulação de dados.

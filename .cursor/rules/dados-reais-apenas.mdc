@@ -1,0 +1,15 @@
+---
+description: Evite uso de dados falsos ou placeholders nos registros principais de produção.
+globs: ["prisma/seed.ts", "app/api/**/*"]
+alwaysApply: true
+---
+
+Os dados inseridos para filmes e séries devem ser reais e completos:
+
+- Título
+- Ano de lançamento
+- Tipo de mídia (DVD, BluRay, VHS)
+- Localização (código da estante)
+- Capa e informações de produção
+
+Evite usar `Lorem Ipsum`, `teste`, `123`, etc.

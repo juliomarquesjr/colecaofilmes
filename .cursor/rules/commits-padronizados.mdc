@@ -1,0 +1,20 @@
+---
+description: Todos os commits devem seguir uma convenção padrão para facilitar o entendimento e rastreamento.
+globs: ["**/*"]
+alwaysApply: true
+---
+
+Utilize a convenção de commits no formato:
+
+```
+tipo(contexto): descrição breve
+```
+
+Tipos sugeridos:
+- `feat`: nova funcionalidade
+- `fix`: correção de bug
+- `docs`: alteração na documentação
+- `refactor`: refatoramento de código
+- `style`: ajustes de estilo (sem alteração de lógica)
+- `test`: adição ou modificação de testes
+- `chore`: outras mudanças (build, dependências, etc.)

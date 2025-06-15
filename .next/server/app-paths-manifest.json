@@ -1,0 +1,8 @@
+{
+  "/filmes/page": "app/filmes/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/api/filmes/route": "app/api/filmes/route.js",
+  "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
+  "/api/tmdb/search/route": "app/api/tmdb/search/route.js",
+  "/api/generos/route": "app/api/generos/route.js"
+}

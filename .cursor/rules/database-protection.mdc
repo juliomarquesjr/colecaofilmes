@@ -1,0 +1,12 @@
+---
+description: Proteja a consistência do banco de dados evitando remoções físicas sem backup.
+globs: ["prisma/schema.prisma", "app/api/**/*"]
+alwaysApply: true
+---
+
+Ao excluir filmes ou séries:
+- Prefira remoção lógica (campo `deletedAt` ou `ativo: false`)
+- Mantenha referências úteis para rastreamento
+- Crie backups regulares se aplicável
+
+Evite `deleteMany` ou comandos destrutivos sem validação extra.

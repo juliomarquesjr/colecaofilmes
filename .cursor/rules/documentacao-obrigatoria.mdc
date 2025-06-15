@@ -1,0 +1,15 @@
+---
+description: Toda funcionalidade nova deve ser acompanhada de documentação clara no README ou em arquivos de ajuda.
+globs: ["app/**/*", "pages/**/*", "lib/**/*"]
+alwaysApply: true
+---
+
+Qualquer novo recurso ou rota implementada deve ser documentado, com exemplos de uso, onde aplicável.
+
+Inclua:
+- Objetivo da funcionalidade
+- Como acessá-la
+- Campos obrigatórios ou formatos esperados
+- Comportamento esperado
+
+Atualize o `README.md` quando relevante.

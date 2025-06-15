@@ -1,0 +1,13 @@
+---
+description: Cada PR deve incluir uma descrição clara do contexto da mudança realizada.
+globs: ["app/**/*", "lib/**/*", "pages/**/*", "prisma/**/*"]
+alwaysApply: true
+---
+
+Para manter a compreensão e o histórico claro das alterações, cada pull request deve conter uma descrição que explique:
+
+- O problema resolvido
+- A solução proposta
+- Qualquer impacto esperado (UI, dados, comportamentos)
+
+Inclua prints de tela quando houver impacto visual.
