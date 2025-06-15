@@ -1,10 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
-export async function GET(request: Request) {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get("q");
 
     if (!query) {
@@ -24,7 +26,8 @@ export async function GET(request: Request) {
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${encodeURIComponent(
         query
-      )}&type=video&key=${YOUTUBE_API_KEY}`
+      )}&type=video&key=${YOUTUBE_API_KEY}`,
+      { cache: 'no-store' }
     );
 
     if (!response.ok) {

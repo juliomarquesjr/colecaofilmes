@@ -4,7 +4,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { Youtube } from "lucide-react";
 
 interface VideoPlayerModalProps {
@@ -19,13 +19,18 @@ function getYouTubeVideoId(url: string) {
   return match ? match[1] : null;
 }
 
-const overlayVariants = {
+const overlayVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
 };
 
-const modalVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 20 },
+const modalVariants: Variants = {
+  hidden: { 
+    opacity: 0, 
+    scale: 0.95, 
+    y: 20,
+    transition: { duration: 0.2 }
+  },
   visible: { 
     opacity: 1, 
     scale: 1, 
@@ -40,9 +45,7 @@ const modalVariants = {
     opacity: 0, 
     scale: 0.95, 
     y: 20,
-    transition: {
-      duration: 0.2
-    }
+    transition: { duration: 0.2 }
   }
 };
 

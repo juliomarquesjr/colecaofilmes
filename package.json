@@ -2,7 +2,7 @@
   "name": "filmes",
   "version": "0.1.0",
   "private": true,
-  "main": "electron/main.js",
+  "main": "./electron-dist/main.js",
   "author": {
     "name": "Seu Nome",
     "email": "seu.email@exemplo.com"
@@ -13,15 +13,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-build": "next build && electron-builder --win --dir",
-    "electron-start": "electron ."
+    "electron-dev": "cross-env NODE_ENV=development concurrently \"npm run dev\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
+    "electron-build": "cross-env NODE_ENV=production next build && tsc -p electron && electron-builder --win",
+    "electron-pack": "npm run electron-build",
+    "electron-start": "cross-env NODE_ENV=production tsc -p electron && electron .",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "appId": "com.filmes.app",
     "productName": "Catálogo de Filmes",
     "files": [
-      "electron/**/*",
+      "electron-dist/**/*",
       ".next/**/*",
       "public/**/*",
       "node_modules/**/*",
@@ -79,9 +81,9 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
     "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
     "electron": "^36.4.0",
     "electron-builder": "^26.0.12",
-    "electron-is-dev": "^3.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
