@@ -27,7 +27,7 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
         <Button
           size="sm"
           variant="secondary"
-          className="flex-1"
+          className="h-8 w-32 border-zinc-700 bg-zinc-800/50 text-zinc-100 hover:bg-zinc-800 hover:text-white"
         >
           <Eye className="h-4 w-4 mr-2" />
           Ver

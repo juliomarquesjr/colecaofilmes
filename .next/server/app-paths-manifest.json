@@ -1,6 +1,8 @@
 {
-  "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
   "/filmes/page": "app/filmes/page.js",
-  "/api/generos/[id]/route": "app/api/generos/[id]/route.js",
-  "/api/generos/route": "app/api/generos/route.js"
+  "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
+  "/api/generos/route": "app/api/generos/route.js",
+  "/filmes/[id]/editar/page": "app/filmes/[id]/editar/page.js",
+  "/api/filmes/route": "app/api/filmes/route.js",
+  "/api/filmes/[id]/route": "app/api/filmes/[id]/route.js"
 }

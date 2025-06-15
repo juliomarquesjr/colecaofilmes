@@ -5,6 +5,7 @@ import { MovieCard } from "@/components/movie-card"
 import { MovieFilters } from "@/components/movie-filters"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import { type Movie } from "@/generated/prisma/client"
 import { FilmIcon, Plus, Search } from "lucide-react"
 import Link from "next/link"
@@ -141,88 +142,101 @@ export default function FilmesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col gap-6">
-        {/* Cabeçalho */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-            <FilmIcon className="h-8 w-8" />
-            Meus Filmes
-          </h1>
-          <div className="flex items-center gap-2">
-            <GenreManagementModal
-              genres={genres}
-              onGenresChange={setGenres}
-            />
-            <Link href="/filmes/cadastrar">
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Adicionar Filme
-              </Button>
-            </Link>
+    <div className="mx-auto max-w-[1400px] space-y-8 p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-indigo-600/10 p-2 text-indigo-400">
+            <FilmIcon className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-100">Meus Filmes</h1>
+            <p className="text-sm text-zinc-400">
+              {filteredMovies.length} {filteredMovies.length === 1 ? "filme" : "filmes"} no total
+            </p>
           </div>
         </div>
 
-        {/* Barra de Pesquisa e Filtros */}
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-            <Input
-              type="text"
-              placeholder="Buscar filmes..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-            />
-          </div>
-
-          <MovieFilters
+        <div className="flex items-center gap-2">
+          <GenreManagementModal
             genres={genres}
-            selectedGenre={selectedGenre}
-            selectedYear={selectedYear}
-            selectedRating={selectedRating}
-            onGenreChange={setSelectedGenre}
-            onYearChange={setSelectedYear}
-            onRatingChange={setSelectedRating}
-            onClearFilters={handleClearFilters}
-            availableYears={availableYears}
+            onGenresChange={setGenres}
+          />
+          <Link href="/filmes/cadastrar">
+            <Button className="bg-indigo-600 text-white hover:bg-indigo-700">
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar Filme
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
+        {/* Barra de Pesquisa */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+          <Input
+            type="text"
+            placeholder="Buscar por título, ano, mídia ou código..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 h-11 bg-zinc-800/50 border-zinc-700 text-zinc-100 focus-visible:ring-1 focus-visible:ring-indigo-500"
           />
         </div>
 
-        {/* Lista de Filmes */}
-        {filteredMovies.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <FilmIcon className="w-12 h-12 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">
+        <Separator className="my-4" />
+
+        {/* Filtros */}
+        <MovieFilters
+          genres={genres}
+          selectedGenre={selectedGenre}
+          selectedYear={selectedYear}
+          selectedRating={selectedRating}
+          onGenreChange={setSelectedGenre}
+          onYearChange={setSelectedYear}
+          onRatingChange={setSelectedRating}
+          onClearFilters={handleClearFilters}
+          availableYears={availableYears}
+        />
+      </div>
+
+      {/* Lista de Filmes */}
+      {filteredMovies.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 py-16">
+          <div className="rounded-full bg-zinc-900 p-4">
+            <FilmIcon className="h-8 w-8 text-zinc-600" />
+          </div>
+          <div className="text-center">
+            <h3 className="text-lg font-medium text-zinc-100">
               {movies.length === 0 ? "Nenhum filme cadastrado" : "Nenhum filme encontrado"}
-            </h2>
-            <p className="text-muted-foreground mb-6">
+            </h3>
+            <p className="mt-1 text-sm text-zinc-400">
               {movies.length === 0
                 ? "Comece adicionando seu primeiro filme ao catálogo."
                 : "Tente ajustar os filtros ou termos da sua pesquisa."}
             </p>
-            {movies.length === 0 && (
-              <Link href="/filmes/cadastrar">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Adicionar Filme
-                </Button>
-              </Link>
-            )}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-            {filteredMovies.map((movie) => (
-              <MovieCard
-                key={movie.id}
-                movie={movie}
-                onEdit={() => router.push(`/filmes/${movie.id}/editar`)}
-                onDelete={() => handleDelete(movie.id)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+          {movies.length === 0 && (
+            <Link href="/filmes/cadastrar">
+              <Button className="bg-indigo-600 text-white hover:bg-indigo-700">
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar Filme
+              </Button>
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+          {filteredMovies.map((movie) => (
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              onEdit={() => router.push(`/filmes/${movie.id}/editar`)}
+              onDelete={() => handleDelete(movie.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 } 
