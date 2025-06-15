@@ -1,8 +1,7 @@
 {
-  "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
+  "/not-found": "app/not-found.js",
   "/api/filmes/route": "app/api/filmes/route.js",
-  "/api/tmdb/search/route": "app/api/tmdb/search/route.js",
   "/filmes/page": "app/filmes/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/api/generos/route": "app/api/generos/route.js"
+  "/page": "app/page.js",
+  "/api/filmes/[id]/route": "app/api/filmes/[id]/route.js"
 }

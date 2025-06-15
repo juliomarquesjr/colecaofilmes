@@ -11,6 +11,7 @@ const filmeSchema = z.object({
   shelfCode: z.string().min(1, 'Código da estante obrigatório'),
   coverUrl: z.string().url('URL da capa inválida'),
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
+  rating: z.number().min(0).max(10).optional(),
   genreIds: z.array(z.number()).optional(),
 });
 
@@ -40,10 +41,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    
-    // Valida os dados recebidos
-    const validatedData = filmeSchema.parse(body);
+    const data = await request.json();
+    const validatedData = filmeSchema.parse(data);
 
     const movie = await prisma.movie.create({
       data: {
@@ -55,6 +54,7 @@ export async function POST(request: Request) {
         shelfCode: validatedData.shelfCode,
         coverUrl: validatedData.coverUrl,
         productionInfo: validatedData.productionInfo,
+        rating: validatedData.rating,
         genres: validatedData.genreIds ? {
           connect: validatedData.genreIds.map(id => ({ id }))
         } : undefined,
@@ -66,17 +66,16 @@ export async function POST(request: Request) {
 
     return NextResponse.json(movie);
   } catch (error) {
-    console.error('Erro ao cadastrar filme:', error);
-    
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Dados inválidos", details: error.errors },
+        { error: error.errors[0].message },
         { status: 400 }
       );
     }
 
+    console.error('Erro ao criar filme:', error);
     return NextResponse.json(
-      { error: "Erro ao cadastrar filme" },
+      { error: "Erro ao criar filme" },
       { status: 500 }
     );
   }

@@ -23,25 +23,18 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Eye, ImageIcon, MoreVertical, Pencil, Trash } from "lucide-react"
+import { type Movie } from "@/generated/prisma/client"
+import { ImageIcon, MoreVertical, Pencil, Star, Trash } from "lucide-react"
 import { useState } from "react"
+import { MoviePreviewModal } from "./movie-preview-modal"
 
 interface MovieCardProps {
-  movie: {
-    id: number
-    title: string
-    year: number
-    mediaType: string
-    shelfCode: string
-    coverUrl: string
-    productionInfo: string
-  }
-  onView: (id: number) => void
+  movie: Movie
   onEdit: (id: number) => void
   onDelete: (id: number) => void
 }
 
-export function MovieCard({ movie, onView, onEdit, onDelete }: MovieCardProps) {
+export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
   const [imageError, setImageError] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -61,23 +54,24 @@ export function MovieCard({ movie, onView, onEdit, onDelete }: MovieCardProps) {
             onError={() => setImageError(true)}
           />
         )}
+        {/* Nota do filme */}
+        {movie.rating && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded bg-black/60">
+            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+            <span className="text-sm font-medium text-yellow-500">
+              {movie.rating.toFixed(1)}
+            </span>
+          </div>
+        )}
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-center gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              className="flex-1"
-              onClick={() => onView(movie.id)}
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              Ver
-            </Button>
+            <MoviePreviewModal movie={movie} />
           </div>
         </div>
       </div>
 
-      <CardHeader className="p-4 pb-2">
+      <CardHeader className="p-4">
         <div className="flex items-start justify-between">
           <h3 className="font-semibold line-clamp-1" title={movie.title}>
             {movie.title}

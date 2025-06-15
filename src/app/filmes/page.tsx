@@ -3,21 +3,12 @@
 import { MovieCard } from "@/components/movie-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { type Movie } from "@/generated/prisma/client"
 import { FilmIcon, Plus, Search } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-
-interface Movie {
-  id: number
-  title: string
-  year: number
-  mediaType: string
-  shelfCode: string
-  coverUrl: string
-  productionInfo: string
-}
 
 export default function FilmesPage() {
   const router = useRouter()
@@ -134,7 +125,6 @@ export default function FilmesPage() {
             <MovieCard
               key={movie.id}
               movie={movie}
-              onView={() => router.push(`/filmes/${movie.id}`)}
               onEdit={() => router.push(`/filmes/${movie.id}/editar`)}
               onDelete={() => handleDelete(movie.id)}
             />
