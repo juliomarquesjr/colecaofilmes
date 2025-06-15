@@ -1,5 +1,4 @@
 {
-  "/api/generos/route": "app/api/generos/route.js",
   "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/filmes/page": "app/filmes/page.js"
 }

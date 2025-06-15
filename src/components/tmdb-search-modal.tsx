@@ -1,5 +1,6 @@
-import { CalendarIcon, CheckIcon, FilmIcon, Loader2Icon, SearchIcon, StarIcon } from 'lucide-react'
-import { useState } from 'react'
+import debounce from 'lodash/debounce'
+import { FilmIcon, Loader2, Plus, SearchIcon, Star } from 'lucide-react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from './ui/button'
 import {
@@ -8,26 +9,23 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
+    DialogTrigger
 } from './ui/dialog'
 import { Input } from './ui/input'
 
 interface TMDBMovie {
   id: number
   title: string
+  original_title: string
   release_date: string
   poster_path: string | null
-  backdrop_path: string | null
-  overview: string
+  production_countries?: { iso_3166_1: string; name: string }[]
   vote_average: number
-  original_title: string
-  original_language: string
-  popularity: number
-  production_countries?: Array<{ iso_3166_1: string, name: string }>
+  genres: { id: number; name: string }[]
 }
 
 interface TMDBSearchModalProps {
-  onMovieSelect: (movie: {
+  onMovieSelect: (movieData: {
     title: string
     year: number
     coverUrl: string
@@ -40,68 +38,67 @@ export function TMDBSearchModal({ onMovieSelect }: TMDBSearchModalProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [movies, setMovies] = useState<TMDBMovie[]>([])
-  const [selectedMovie, setSelectedMovie] = useState<TMDBMovie | null>(null)
+  const [searchStatus, setSearchStatus] = useState<string>('')
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) return
-
-    setIsLoading(true)
-    setMovies([])
-    setSelectedMovie(null)
-
-    try {
-      const res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(searchTerm)}`)
-      if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.error || 'Erro ao buscar filmes')
+  const searchMovies = useCallback(
+    debounce(async (term: string) => {
+      if (!term.trim()) {
+        setMovies([])
+        setSearchStatus('')
+        return
       }
-      
-      const data = await res.json()
-      setMovies(data.results)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Erro ao buscar filmes no TMDB')
-      console.error(error)
-    } finally {
-      setIsLoading(false)
-    }
+
+      setIsLoading(true)
+      setSearchStatus(`Pesquisando por "${term}"...`)
+
+      try {
+        const res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(term)}`)
+        if (!res.ok) throw new Error('Erro ao buscar filmes')
+        
+        const data = await res.json()
+        setMovies(data.results || [])
+        
+        if (data.results.length === 0) {
+          setSearchStatus('Nenhum filme encontrado com este título')
+        } else {
+          setSearchStatus(`${data.results.length} filmes encontrados`)
+        }
+      } catch (error) {
+        console.error(error)
+        toast.error('Erro ao buscar filmes no TMDB')
+        setSearchStatus('Erro ao realizar a busca')
+        setMovies([])
+      } finally {
+        setIsLoading(false)
+      }
+    }, 500),
+    []
+  )
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearchTerm(value)
+    setSearchStatus(value.trim() ? 'Aguarde...' : '')
+    searchMovies(value)
   }
 
-  const formatReleaseDate = (date: string) => {
-    try {
-      return new Intl.DateTimeFormat('pt-BR', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      }).format(new Date(date))
-    } catch {
-      return 'Data desconhecida'
-    }
-  }
-
-  const handleSelect = (movie: TMDBMovie) => {
-    setSelectedMovie(movie)
-
-    // Prepara as informações de produção
-    const productionInfo = [
-      `Título Original: ${movie.original_title}`,
-      `Idioma Original: ${movie.original_language.toUpperCase()}`,
-      movie.production_countries?.length 
-        ? `Países de Produção: ${movie.production_countries.map(c => c.name).join(', ')}`
-        : null,
-      `Popularidade: ${movie.popularity.toFixed(1)}`,
-      movie.overview
-    ].filter(Boolean).join('\n\n')
-
+  const handleMovieSelect = (movie: TMDBMovie) => {
+    const year = movie.release_date ? parseInt(movie.release_date.split('-')[0]) : 0
+    const coverUrl = movie.poster_path
+      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+      : ''
+    const productionCountries = movie.production_countries?.map(country => country.name).join(', ') || 'País não informado'
+    
     onMovieSelect({
       title: movie.title,
-      year: new Date(movie.release_date).getFullYear(),
-      coverUrl: movie.poster_path 
-        ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-        : '/placeholder-movie.jpg',
-      productionInfo,
+      year,
+      coverUrl,
+      productionInfo: `Produzido em: ${productionCountries}`,
     })
+    
     setOpen(false)
-    toast.success('Informações do filme importadas com sucesso!')
+    setSearchTerm('')
+    setMovies([])
   }
 
   return (
@@ -115,103 +112,119 @@ export function TMDBSearchModal({ onMovieSelect }: TMDBSearchModalProps) {
           Buscar no TMDB
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] bg-zinc-900 text-zinc-100 border border-zinc-800">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            <FilmIcon className="h-5 w-5 text-indigo-400" />
+      <DialogContent className="sm:max-w-[1000px] max-h-[90vh] bg-zinc-900 text-zinc-100 border border-zinc-800 flex flex-col">
+        <DialogHeader className="flex-shrink-0">
+          <DialogTitle className="text-xl font-semibold flex items-center gap-3 text-white">
+            <div className="p-2 rounded-lg bg-indigo-950/50 border border-indigo-900/50">
+              <FilmIcon className="h-5 w-5 text-indigo-400" />
+            </div>
             Buscar Filme no TMDB
           </DialogTitle>
-          <DialogDescription className="text-zinc-400">
+          <DialogDescription className="text-zinc-400 mt-2">
             Pesquise por título para preencher automaticamente as informações do filme.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
+        <div className="space-y-6 flex-shrink-0">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <Input
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+              onChange={handleSearchChange}
+              className="bg-zinc-800 border-zinc-700 text-zinc-100 pl-10 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
               placeholder="Digite o título do filme..."
             />
-            <Button 
-              onClick={handleSearch}
-              disabled={isLoading || !searchTerm.trim()}
-              className="bg-indigo-950 hover:bg-indigo-900 text-indigo-100 border border-indigo-800"
-            >
-              {isLoading ? (
-                <Loader2Icon className="h-4 w-4 animate-spin" />
-              ) : (
-                <SearchIcon className="h-4 w-4" />
-              )}
-            </Button>
           </div>
 
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2Icon className="h-8 w-8 animate-spin text-indigo-500" />
+          {searchStatus && (
+            <div className="flex items-center gap-2 text-sm text-zinc-400">
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {searchStatus}
             </div>
-          ) : movies.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
+          )}
+        </div>
+
+        {movies.length > 0 && (
+          <div className="overflow-y-auto flex-grow mt-6 pr-2 -mr-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {movies.map((movie) => (
                 <div
                   key={movie.id}
-                  className={`
-                    relative rounded-lg border p-3
-                    ${selectedMovie?.id === movie.id
-                      ? 'bg-indigo-950/50 border-indigo-800'
-                      : 'bg-zinc-800/50 border-zinc-700'
-                    }
-                  `}
+                  className="group relative bg-zinc-800 rounded-lg border border-zinc-700 overflow-hidden hover:border-indigo-800 transition-colors flex"
                 >
-                  <div className="flex gap-3">
-                    {movie.poster_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
-                        alt={movie.title}
-                        className="w-16 h-24 object-cover rounded"
-                      />
-                    ) : (
-                      <div className="w-16 h-24 bg-zinc-800 rounded flex items-center justify-center">
-                        <FilmIcon className="h-8 w-8 text-zinc-600" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-zinc-100 truncate">{movie.title}</h3>
-                      <div className="flex items-center gap-2 mt-1 text-sm text-zinc-400">
-                        <CalendarIcon className="h-3 w-3" />
-                        <span>{formatReleaseDate(movie.release_date)}</span>
-                      </div>
-                      <div className="mt-1 flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-yellow-950 text-yellow-500 border border-yellow-900/50">
-                          <StarIcon className="h-3 w-3" />
-                          <span>{movie.vote_average.toFixed(1)}</span>
+                  {/* Capa do Filme */}
+                  <div className="relative w-[100px] flex-shrink-0">
+                    <div className="aspect-[2/3] w-full relative bg-zinc-900">
+                      {movie.poster_path ? (
+                        <img
+                          src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
+                          alt={movie.title}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <FilmIcon className="h-8 w-8 text-zinc-700" />
                         </div>
-                        <span className="text-xs text-zinc-500 uppercase">{movie.original_language}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full bg-indigo-950 hover:bg-indigo-900 text-indigo-100 border-indigo-800"
-                          onClick={() => handleSelect(movie)}
-                        >
-                          <CheckIcon className="h-4 w-4 mr-2" />
-                          Selecionar
-                        </Button>
-                      </div>
+                      )}
                     </div>
+                    {/* Nota do filme */}
+                    <div className="absolute top-1 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/60 text-yellow-500 text-xs font-medium">
+                      <Star className="h-3 w-3 fill-yellow-500" />
+                      {movie.vote_average.toFixed(1)}
+                    </div>
+                  </div>
+                  
+                  {/* Informações do Filme */}
+                  <div className="flex flex-col flex-1 p-3 min-w-0">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-zinc-100 line-clamp-1">
+                        {movie.title}
+                      </h3>
+                      {movie.original_title !== movie.title && (
+                        <p className="text-xs text-zinc-500 mt-0.5 line-clamp-1">
+                          Título Original: {movie.original_title}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 flex-wrap mt-1.5 text-xs">
+                        <span className="text-zinc-400">
+                          {movie.release_date ? movie.release_date.split('-')[0] : 'Ano não informado'}
+                        </span>
+                        {movie.production_countries && movie.production_countries.length > 0 && (
+                          <span className="text-zinc-500 line-clamp-1">
+                            • {movie.production_countries[0].name}
+                          </span>
+                        )}
+                      </div>
+                      {movie.genres && movie.genres.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-xs text-zinc-500 mb-1">Gêneros:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {movie.genres.map(genre => (
+                              <span 
+                                key={genre.id}
+                                className="px-1.5 py-0.5 bg-zinc-700/50 text-zinc-300 rounded text-xs"
+                              >
+                                {genre.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      onClick={() => handleMovieSelect(movie)}
+                      className="w-full mt-3 bg-indigo-950 hover:bg-indigo-900 text-indigo-100 border border-indigo-800"
+                      size="sm"
+                    >
+                      <Plus className="mr-1.5 h-3.5 w-3.5" />
+                      Selecionar
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
-          ) : searchTerm && !isLoading ? (
-            <div className="text-center py-8 text-zinc-400">
-              Nenhum filme encontrado para "{searchTerm}"
-            </div>
-          ) : null}
-        </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )
