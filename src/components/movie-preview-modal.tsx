@@ -1,12 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye, FilmIcon, FolderIcon, Star, Youtube } from "lucide-react";
@@ -216,6 +216,9 @@ export function MoviePreviewModal({ movie, isLoading = false }: MoviePreviewModa
                             transition={{ delay: 0.4 }}
                             className="flex flex-wrap items-center gap-2"
                           >
+                            <Badge variant="outline" className="bg-zinc-800/50 border-indigo-900/50 text-indigo-400">
+                              Código: {movie.uniqueCode}
+                            </Badge>
                             <Badge variant="outline" className="bg-zinc-800">
                               {movie.year}
                             </Badge>
