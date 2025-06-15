@@ -19,6 +19,7 @@ const filmeSchema = z.object({
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.number().min(0).max(10).optional(),
   genreId: z.number().optional(),
+  trailerUrl: z.string().url('URL do trailer inválida').optional(),
 })
 
 export async function GET(request: Request, { params }: RouteParams) {
@@ -105,6 +106,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         coverUrl: validatedData.coverUrl,
         productionInfo: validatedData.productionInfo,
         rating: validatedData.rating,
+        trailerUrl: validatedData.trailerUrl,
         genres: {
           set: [], // Remove todos os gêneros existentes
           connect: validatedData.genreId ? [{ id: validatedData.genreId }] : []

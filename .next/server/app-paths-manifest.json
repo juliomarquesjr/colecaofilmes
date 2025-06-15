@@ -1,10 +1,5 @@
 {
   "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
   "/filmes/page": "app/filmes/page.js",
-  "/filmes/[id]/editar/page": "app/filmes/[id]/editar/page.js",
-  "/api/generos/route": "app/api/generos/route.js",
-  "/api/youtube/search/route": "app/api/youtube/search/route.js",
-  "/api/filmes/generate-code/route": "app/api/filmes/generate-code/route.js",
-  "/api/filmes/route": "app/api/filmes/route.js",
-  "/api/filmes/[id]/route": "app/api/filmes/[id]/route.js"
+  "/filmes/[id]/editar/page": "app/filmes/[id]/editar/page.js"
 }
