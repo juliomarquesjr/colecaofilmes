@@ -1,6 +1,8 @@
 'use client';
 
+import { AnimatedCard, AnimatedFormContainer, AnimatedFormPage, AnimatedFormSection, AnimatedPreview } from '@/components/animated-form-page';
 import { GenreModal } from '@/components/genre-modal';
+import { MovieEditSkeleton } from '@/components/movie-edit-skeleton';
 import { TMDBSearchModal } from '@/components/tmdb-search-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +15,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { VideoPlayerModal } from '@/components/video-player-modal';
 import { YouTubeSearchModal } from '@/components/youtube-search-modal';
+import { getYouTubeVideoId } from '@/lib/utils';
+import { motion } from 'framer-motion';
 import { ArrowLeft, BookmarkIcon, FilmIcon, InfoIcon, Star, Youtube } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -61,6 +66,7 @@ export default function EditarFilme() {
   const [selectedGenre, setSelectedGenre] = useState('');
   const [genres, setGenres] = useState<Genre[]>([]);
   const [isLoadingMovie, setIsLoadingMovie] = useState(true);
+  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
     fetchGenres();
@@ -185,22 +191,22 @@ export default function EditarFilme() {
     toast.success('Informações do filme atualizadas!');
   };
 
+  // Extrair o ID do vídeo da URL
+  const videoId = form.trailerUrl ? getYouTubeVideoId(form.trailerUrl) : null;
+
   if (isLoadingMovie) {
-    return (
-      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground">Carregando filme...</p>
-        </div>
-      </div>
-    );
+    return <MovieEditSkeleton />;
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950">
+    <AnimatedFormPage>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-4 mb-8"
+          >
             <Link href="/filmes">
               <Button 
                 variant="ghost" 
@@ -214,261 +220,266 @@ export default function EditarFilme() {
               <FilmIcon className="h-8 w-8" />
               Editar Filme
             </h1>
-          </div>
+          </motion.div>
 
           <div className="grid lg:grid-cols-[1fr,300px] gap-6">
-            <div className="space-y-6">
+            <AnimatedFormSection>
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-gradient-to-br from-indigo-950 to-zinc-900 rounded-lg border border-indigo-800/30 p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-lg bg-indigo-900/30 border border-indigo-800/30">
-                      <FilmIcon className="h-5 w-5 text-indigo-400" />
+                <AnimatedCard>
+                  <div className="bg-gradient-to-br from-indigo-950 to-zinc-900 rounded-lg border border-indigo-800/30 p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 rounded-lg bg-indigo-900/30 border border-indigo-800/30">
+                        <FilmIcon className="h-5 w-5 text-indigo-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-semibold text-white">Importar do TMDB</h2>
+                        <p className="text-sm text-zinc-400">Busque e importe informações do filme</p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-lg font-semibold text-white">Importar do TMDB</h2>
-                      <p className="text-sm text-zinc-400">Busque e importe informações do filme</p>
-                    </div>
+                    <TMDBSearchModal onMovieSelect={handleTMDBSelect} />
                   </div>
-                  <TMDBSearchModal onMovieSelect={handleTMDBSelect} />
-                </div>
+                </AnimatedCard>
 
-                <div className="bg-gradient-to-br from-red-950 to-zinc-900 rounded-lg border border-red-800/30 p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-lg bg-red-900/30 border border-red-800/30">
-                      <Youtube className="h-5 w-5 text-red-400" />
+                <AnimatedCard>
+                  <div className="bg-gradient-to-br from-red-950 to-zinc-900 rounded-lg border border-red-800/30 p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 rounded-lg bg-red-900/30 border border-red-800/30">
+                        <Youtube className="h-5 w-5 text-red-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-semibold text-white">Trailer do Filme</h2>
+                        <p className="text-sm text-zinc-400">Busque e adicione o trailer as informações fime</p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-lg font-semibold text-white">Trailer do Filme</h2>
-                      <p className="text-sm text-zinc-400">Busque e adicione o trailer</p>
-                    </div>
+                    <YouTubeSearchModal onVideoSelect={(url) => setForm({ ...form, trailerUrl: url })} />
                   </div>
-                  <YouTubeSearchModal onVideoSelect={(url) => setForm({ ...form, trailerUrl: url })} />
-                </div>
+                </AnimatedCard>
               </div>
 
-              <form onSubmit={handleSubmit} className="bg-zinc-900 rounded-lg border border-zinc-800 divide-y divide-zinc-800">
-                {error && (
-                  <div className="p-4 bg-red-950/50 text-red-200 rounded-t-lg border-b border-red-900/50">
-                    <div className="flex items-center gap-2">
-                      <span className="text-red-500">•</span>
-                      {error}
+              <AnimatedFormContainer>
+                <form onSubmit={handleSubmit} className="bg-zinc-900 rounded-lg border border-zinc-800 divide-y divide-zinc-800">
+                  {error && (
+                    <div className="p-4 bg-red-950/50 text-red-200 rounded-t-lg border-b border-red-900/50">
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-500">•</span>
+                        {error}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 rounded-lg bg-zinc-800 border border-zinc-700">
+                        <InfoIcon className="h-5 w-5 text-zinc-400" />
+                      </div>
+                      <div className="flex-1">
+                        <h2 className="text-lg font-semibold text-white">Informações Básicas</h2>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-zinc-400">Código:</p>
+                        <div className="px-2 py-1 bg-zinc-800 rounded border border-zinc-700">
+                          <code className="text-sm font-mono text-zinc-300">{form.uniqueCode}</code>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-6">
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="title" className="text-zinc-300">
+                            Título
+                          </Label>
+                          <Input
+                            id="title"
+                            name="title"
+                            value={form.title}
+                            onChange={handleChange}
+                            className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                            placeholder="Digite o título do filme"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="originalTitle" className="text-zinc-300">
+                            Título Original
+                          </Label>
+                          <Input
+                            id="originalTitle"
+                            name="originalTitle"
+                            value={form.originalTitle}
+                            onChange={handleChange}
+                            className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                            placeholder="Digite o título original"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="overview" className="text-zinc-300">
+                          Sinopse
+                        </Label>
+                        <Textarea
+                          id="overview"
+                          name="overview"
+                          value={form.overview}
+                          onChange={handleChange}
+                          className="min-h-[120px] bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800 resize-y"
+                          placeholder="Digite a sinopse do filme"
+                        />
+                      </div>
                     </div>
                   </div>
-                )}
 
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-lg bg-zinc-800 border border-zinc-700">
-                      <InfoIcon className="h-5 w-5 text-zinc-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="text-lg font-semibold text-white">Informações Básicas</h2>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-zinc-400">Código:</p>
-                      <div className="px-2 py-1 bg-zinc-800 rounded border border-zinc-700">
-                        <code className="text-sm font-mono text-zinc-300">{form.uniqueCode}</code>
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 rounded-lg bg-zinc-800 border border-zinc-700">
+                        <BookmarkIcon className="h-5 w-5 text-zinc-400" />
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-6">
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="title" className="text-zinc-300">
-                          Título
-                        </Label>
-                        <Input
-                          id="title"
-                          name="title"
-                          value={form.title}
-                          onChange={handleChange}
-                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                          placeholder="Digite o título do filme"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="originalTitle" className="text-zinc-300">
-                          Título Original
-                        </Label>
-                        <Input
-                          id="originalTitle"
-                          name="originalTitle"
-                          value={form.originalTitle}
-                          onChange={handleChange}
-                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                          placeholder="Digite o título original"
-                        />
-                      </div>
+                      <h2 className="text-lg font-semibold text-white">Detalhes do Filme</h2>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="overview" className="text-zinc-300">
-                        Sinopse
-                      </Label>
-                      <Textarea
-                        id="overview"
-                        name="overview"
-                        value={form.overview}
-                        onChange={handleChange}
-                        className="min-h-[120px] bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800 resize-y"
-                        placeholder="Digite a sinopse do filme"
-                      />
-                    </div>
-                  </div>
-                </div>
+                    <div className="grid gap-6">
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="year" className="text-zinc-300">
+                            Ano
+                          </Label>
+                          <Input
+                            id="year"
+                            name="year"
+                            type="number"
+                            value={form.year}
+                            onChange={handleChange}
+                            className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                            placeholder="Digite o ano"
+                          />
+                        </div>
 
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-lg bg-zinc-800 border border-zinc-700">
-                      <BookmarkIcon className="h-5 w-5 text-zinc-400" />
-                    </div>
-                    <h2 className="text-lg font-semibold text-white">Detalhes do Filme</h2>
-                  </div>
-
-                  <div className="grid gap-6">
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="year" className="text-zinc-300">
-                          Ano
-                        </Label>
-                        <Input
-                          id="year"
-                          name="year"
-                          type="number"
-                          value={form.year}
-                          onChange={handleChange}
-                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                          placeholder="Digite o ano"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="mediaType" className="text-zinc-300">
-                          Tipo de Mídia
-                        </Label>
-                        <Select 
-                          value={form.mediaType} 
-                          onValueChange={(value) => setForm({ ...form, mediaType: value })}
-                        >
-                          <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
-                            <SelectValue placeholder="Selecione o tipo" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
-                            <SelectItem value="DVD" className="text-zinc-100 focus:bg-zinc-700">DVD</SelectItem>
-                            <SelectItem value="BluRay" className="text-zinc-100 focus:bg-zinc-700">BluRay</SelectItem>
-                            <SelectItem value="VHS" className="text-zinc-100 focus:bg-zinc-700">VHS</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="productionInfo" className="text-zinc-300">
-                        Informações de Produção
-                      </Label>
-                      <Input
-                        id="productionInfo"
-                        name="productionInfo"
-                        value={form.productionInfo}
-                        onChange={handleChange}
-                        className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                        placeholder="Diretor, produtora, elenco principal..."
-                      />
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="shelfCode" className="text-zinc-300">
-                          Código da Estante
-                        </Label>
-                        <Input
-                          id="shelfCode"
-                          name="shelfCode"
-                          value={form.shelfCode}
-                          onChange={handleChange}
-                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                          placeholder="Digite o código"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="rating" className="text-zinc-300">
-                          Nota
-                        </Label>
-                        <Input
-                          id="rating"
-                          name="rating"
-                          type="number"
-                          min="0"
-                          max="10"
-                          step="0.1"
-                          value={form.rating}
-                          onChange={handleChange}
-                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                          placeholder="Digite a nota (0-10)"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="genre" className="text-zinc-300">
-                        Gênero
-                      </Label>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
+                        <div className="space-y-2">
+                          <Label htmlFor="mediaType" className="text-zinc-300">
+                            Tipo de Mídia
+                          </Label>
                           <Select 
-                            value={selectedGenre} 
-                            onValueChange={setSelectedGenre}
+                            value={form.mediaType} 
+                            onValueChange={(value) => setForm({ ...form, mediaType: value })}
                           >
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
-                              <SelectValue placeholder="Selecione o gênero" />
+                              <SelectValue placeholder="Selecione o tipo" />
                             </SelectTrigger>
                             <SelectContent className="bg-zinc-800 border-zinc-700">
-                              {genres.map((genre) => (
-                                <SelectItem 
-                                  key={genre.id} 
-                                  value={genre.id.toString()}
-                                  className="text-zinc-100 focus:bg-zinc-700"
-                                >
-                                  {genre.name}
-                                </SelectItem>
-                              ))}
+                              <SelectItem value="DVD" className="text-zinc-100 focus:bg-zinc-700">DVD</SelectItem>
+                              <SelectItem value="BluRay" className="text-zinc-100 focus:bg-zinc-700">BluRay</SelectItem>
+                              <SelectItem value="VHS" className="text-zinc-100 focus:bg-zinc-700">VHS</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-                        <GenreModal onGenreAdded={fetchGenres} />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="productionInfo" className="text-zinc-300">
+                          Informações de Produção
+                        </Label>
+                        <Input
+                          id="productionInfo"
+                          name="productionInfo"
+                          value={form.productionInfo}
+                          onChange={handleChange}
+                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                          placeholder="Diretor, produtora, elenco principal..."
+                        />
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="shelfCode" className="text-zinc-300">
+                            Código da Estante
+                          </Label>
+                          <Input
+                            id="shelfCode"
+                            name="shelfCode"
+                            value={form.shelfCode}
+                            onChange={handleChange}
+                            className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                            placeholder="Digite o código"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="rating" className="text-zinc-300">
+                            Nota
+                          </Label>
+                          <Input
+                            id="rating"
+                            name="rating"
+                            type="number"
+                            min="0"
+                            max="10"
+                            step="0.1"
+                            value={form.rating}
+                            onChange={handleChange}
+                            className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                            placeholder="Digite a nota (0-10)"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="genre" className="text-zinc-300">
+                          Gênero
+                        </Label>
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <Select 
+                              value={selectedGenre} 
+                              onValueChange={setSelectedGenre}
+                            >
+                              <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
+                                <SelectValue placeholder="Selecione o gênero" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-zinc-800 border-zinc-700">
+                                {genres.map((genre) => (
+                                  <SelectItem 
+                                    key={genre.id} 
+                                    value={genre.id.toString()}
+                                    className="text-zinc-100 focus:bg-zinc-700"
+                                  >
+                                    {genre.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <GenreModal onGenreAdded={fetchGenres} />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="p-6 border-t border-zinc-800">
-                  <div className="flex items-center justify-end gap-4">
-                    <Link href="/filmes">
+                  <div className="p-6 border-t border-zinc-800">
+                    <div className="flex items-center justify-end gap-4">
+                      <Link href="/filmes">
+                        <Button 
+                          variant="ghost" 
+                          type="button"
+                          className="bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-800"
+                        >
+                          Cancelar
+                        </Button>
+                      </Link>
                       <Button 
-                        variant="ghost" 
-                        type="button"
-                        className="bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-800"
+                        type="submit" 
+                        disabled={isLoading}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
                       >
-                        Cancelar
+                        {isLoading ? 'Salvando...' : 'Salvar Alterações'}
                       </Button>
-                    </Link>
-                    <Button 
-                      type="submit" 
-                      disabled={isLoading}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                    >
-                      {isLoading ? 'Salvando...' : 'Salvar Alterações'}
-                    </Button>
+                    </div>
                   </div>
-                </div>
-              </form>
-            </div>
+                </form>
+              </AnimatedFormContainer>
+            </AnimatedFormSection>
 
-            {/* Preview */}
-            <div className="hidden lg:block">
+            <AnimatedPreview>
               <div className="bg-zinc-900 rounded-lg border border-zinc-800 p-6 sticky top-8">
                 <h3 className="text-lg font-semibold text-white mb-4">Preview do Filme</h3>
                 <div className="aspect-[2/3] bg-zinc-800 rounded-lg border border-zinc-700 mb-4 relative">
@@ -492,20 +503,50 @@ export default function EditarFilme() {
                     </div>
                   )}
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium text-zinc-100">{form.title || 'Título do Filme'}</h4>
-                  {form.originalTitle && (
-                    <p className="text-sm text-zinc-500">{form.originalTitle}</p>
-                  )}
-                  {form.year && (
-                    <p className="text-sm text-zinc-400">{form.year}</p>
-                  )}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-zinc-100">{form.title || 'Título do Filme'}</h4>
+                    {form.originalTitle && (
+                      <p className="text-sm text-zinc-500">{form.originalTitle}</p>
+                    )}
+                    {form.year && (
+                      <p className="text-sm text-zinc-400">{form.year}</p>
+                    )}
+                  </div>
+
+                  <div className="pt-2 border-t border-zinc-800">
+                    <h5 className="text-sm font-medium text-zinc-300 mb-2">Trailer</h5>
+                    {videoId ? (
+                      <Button
+                        onClick={() => setShowTrailer(true)}
+                        variant="outline"
+                        className="w-full bg-zinc-800/50 border-zinc-700 hover:bg-zinc-800 text-zinc-100"
+                      >
+                        <Youtube className="h-4 w-4 mr-2 text-red-500" />
+                        Assistir Trailer
+                      </Button>
+                    ) : (
+                      <div className="text-sm text-zinc-500 flex items-center gap-2">
+                        <Youtube className="h-4 w-4" />
+                        Nenhum trailer adicionado
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            </AnimatedPreview>
           </div>
         </div>
       </div>
-    </main>
+
+      {videoId && (
+        <VideoPlayerModal
+          videoId={videoId}
+          isOpen={showTrailer}
+          onOpenChange={setShowTrailer}
+          title={`Trailer - ${form.title || 'Filme'}`}
+        />
+      )}
+    </AnimatedFormPage>
   );
 } 

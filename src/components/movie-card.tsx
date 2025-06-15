@@ -33,6 +33,16 @@ interface MovieCardProps {
 export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
   const [imageError, setImageError] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleEdit = async () => {
+    setIsLoading(true)
+    try {
+      await onEdit(movie.id)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <motion.div
@@ -72,7 +82,7 @@ export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
           className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100"
         >
           <div className="flex items-center gap-2">
-            <MoviePreviewModal movie={movie} />
+            <MoviePreviewModal movie={movie} isLoading={isLoading} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -88,17 +98,17 @@ export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
                 className="w-40 bg-zinc-800 border-zinc-700 text-zinc-100"
               >
                 <DropdownMenuItem
-                  onClick={() => onEdit(movie.id)}
-                  className="hover:bg-zinc-700 focus:bg-zinc-700 cursor-pointer"
+                  className="flex items-center gap-2 focus:bg-zinc-700 focus:text-zinc-100"
+                  onClick={handleEdit}
                 >
-                  <Pencil className="mr-2 h-4 w-4" />
+                  <Pencil className="h-4 w-4" />
                   Editar
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  className="flex items-center gap-2 text-red-400 focus:bg-red-950/50 focus:text-red-400"
                   onClick={() => setShowDeleteDialog(true)}
-                  className="text-red-400 hover:bg-red-950/50 hover:text-red-400 focus:bg-red-950/50 focus:text-red-400 cursor-pointer"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                   Excluir
                 </DropdownMenuItem>
               </DropdownMenuContent>
