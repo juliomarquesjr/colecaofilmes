@@ -6,14 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookmarkIcon, FilmIcon, InfoIcon, Star } from 'lucide-react';
+import { YouTubeSearchModal } from '@/components/youtube-search-modal';
+import { ArrowLeft, BookmarkIcon, FilmIcon, InfoIcon, Star, Youtube } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -31,6 +32,7 @@ const filmeSchema = z.object({
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.coerce.number().min(0).max(10).optional(),
   uniqueCode: z.string().min(1, 'Código único obrigatório'),
+  trailerUrl: z.string().url('URL do trailer inválido').optional(),
 });
 
 interface Genre {
@@ -52,6 +54,7 @@ export default function EditarFilme() {
     productionInfo: '',
     rating: '',
     uniqueCode: '',
+    trailerUrl: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +103,7 @@ export default function EditarFilme() {
         productionInfo: movie.productionInfo,
         rating: movie.rating?.toString() || '',
         uniqueCode: movie.uniqueCode,
+        trailerUrl: movie.trailerUrl || '',
       });
 
       // Se o filme tem gêneros, seleciona o primeiro
@@ -214,17 +218,32 @@ export default function EditarFilme() {
 
           <div className="grid lg:grid-cols-[1fr,300px] gap-6">
             <div className="space-y-6">
-              <div className="bg-gradient-to-br from-indigo-950 to-zinc-900 rounded-lg border border-indigo-800/30 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-lg bg-indigo-900/30 border border-indigo-800/30">
-                    <FilmIcon className="h-5 w-5 text-indigo-400" />
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="bg-gradient-to-br from-indigo-950 to-zinc-900 rounded-lg border border-indigo-800/30 p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-lg bg-indigo-900/30 border border-indigo-800/30">
+                      <FilmIcon className="h-5 w-5 text-indigo-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-white">Importar do TMDB</h2>
+                      <p className="text-sm text-zinc-400">Busque e importe informações do filme</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-white">Importar do TMDB</h2>
-                    <p className="text-sm text-zinc-400">Busque e importe informações do filme automaticamente</p>
-                  </div>
+                  <TMDBSearchModal onMovieSelect={handleTMDBSelect} />
                 </div>
-                <TMDBSearchModal onMovieSelect={handleTMDBSelect} />
+
+                <div className="bg-gradient-to-br from-red-950 to-zinc-900 rounded-lg border border-red-800/30 p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-lg bg-red-900/30 border border-red-800/30">
+                      <Youtube className="h-5 w-5 text-red-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-white">Trailer do Filme</h2>
+                      <p className="text-sm text-zinc-400">Busque e adicione o trailer</p>
+                    </div>
+                  </div>
+                  <YouTubeSearchModal onVideoSelect={(url) => setForm({ ...form, trailerUrl: url })} />
+                </div>
               </div>
 
               <form onSubmit={handleSubmit} className="bg-zinc-900 rounded-lg border border-zinc-800 divide-y divide-zinc-800">

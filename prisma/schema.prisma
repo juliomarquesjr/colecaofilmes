@@ -32,6 +32,7 @@ model Movie {
   coverUrl       String
   productionInfo String
   rating         Float?   // Nota do filme (0-10)
+  trailerUrl     String?  // URL do trailer do YouTube
   genres         Genre[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

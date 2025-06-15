@@ -132,10 +132,51 @@ export default function FilmesPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground">Carregando filmes...</p>
+      <div className="mx-auto max-w-[1400px] space-y-8 p-8">
+        {/* Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-zinc-800/50 p-2">
+              <div className="h-6 w-6 rounded bg-zinc-700/50 animate-pulse" />
+            </div>
+            <div>
+              <div className="h-7 w-32 rounded bg-zinc-800/50 animate-pulse" />
+              <div className="mt-1 h-4 w-24 rounded bg-zinc-800/50 animate-pulse" />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-10 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
+            <div className="h-10 w-[140px] rounded bg-zinc-800/50 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Search and Filters Skeleton */}
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
+          <div className="h-11 w-full rounded bg-zinc-800/50 animate-pulse" />
+          <div className="my-4 h-[1px] bg-zinc-800" />
+          <div className="flex flex-wrap gap-2">
+            <div className="h-9 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
+            <div className="h-9 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
+            <div className="h-9 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
+            <div className="h-9 w-[100px] rounded bg-zinc-800/50 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Movies Grid Skeleton */}
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+          {[...Array(12)].map((_, index) => (
+            <div key={index} className="group relative">
+              <div className="aspect-[2/3] w-full overflow-hidden rounded-lg bg-zinc-800/50 animate-pulse" />
+              <div className="mt-2 space-y-2">
+                <div className="h-5 w-3/4 rounded bg-zinc-800/50 animate-pulse" />
+                <div className="h-4 w-1/2 rounded bg-zinc-800/50 animate-pulse" />
+                <div className="flex gap-1">
+                  <div className="h-6 w-16 rounded bg-zinc-800/50 animate-pulse" />
+                  <div className="h-6 w-16 rounded bg-zinc-800/50 animate-pulse" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     )

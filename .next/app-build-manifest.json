@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/page": [
+    "/filmes/cadastrar/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/filmes/cadastrar/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -20,11 +20,6 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/filmes/[id]/editar/page.js"
-    ],
-    "/filmes/cadastrar/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/filmes/cadastrar/page.js"
     ]
   }
 }

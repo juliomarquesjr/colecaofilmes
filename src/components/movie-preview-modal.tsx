@@ -8,7 +8,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { Eye, FilmIcon, FolderIcon, Star } from "lucide-react";
+import { Eye, FilmIcon, FolderIcon, Star, Youtube } from "lucide-react";
+import { useState } from "react";
 
 interface MoviePreviewModalProps {
   movie: {
@@ -23,6 +24,7 @@ interface MoviePreviewModalProps {
     coverUrl: string;
     productionInfo: string;
     rating: number | null;
+    trailerUrl?: string | null;
     genres?: {
       id: number;
       name: string;
@@ -30,7 +32,15 @@ interface MoviePreviewModalProps {
   };
 }
 
+function getYouTubeVideoId(url: string) {
+  const match = url.match(/[?&]v=([^&]+)/);
+  return match ? match[1] : null;
+}
+
 export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
+  const [showTrailer, setShowTrailer] = useState(false);
+  const videoId = movie.trailerUrl ? getYouTubeVideoId(movie.trailerUrl) : null;
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -80,6 +90,19 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
                   </span>
                 </div>
               )}
+              {/* Indicador de Trailer */}
+              {movie.trailerUrl && (
+                <div className="absolute bottom-2 left-2 right-2">
+                  <Button
+                    variant="outline"
+                    className="w-full bg-black/60 border-zinc-700 hover:bg-black/80 text-zinc-100"
+                    onClick={() => setShowTrailer(!showTrailer)}
+                  >
+                    <Youtube className="h-4 w-4 mr-2 text-red-500" />
+                    {showTrailer ? "Ocultar Trailer" : "Assistir Trailer"}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -110,6 +133,12 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
                   {movie.genres[0].name}
                 </Badge>
               )}
+              {movie.trailerUrl && (
+                <Badge variant="outline" className="bg-red-950/50 border-red-900/50 text-red-400 flex items-center gap-1">
+                  <Youtube className="h-3 w-3" />
+                  Trailer Disponível
+                </Badge>
+              )}
             </div>
 
             {movie.overview && (
@@ -126,11 +155,20 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
               <p className="text-sm text-zinc-400">{movie.productionInfo}</p>
             </div>
 
-            {movie.uniqueCode && (
-              <div className="mt-2 px-2 py-1 bg-zinc-800 rounded border border-zinc-700 inline-block">
-                <p className="text-sm font-mono text-zinc-400">
-                  Código: {movie.uniqueCode}
-                </p>
+            {/* Player do YouTube */}
+            {showTrailer && videoId && (
+              <div className="mt-4">
+                <div className="aspect-video rounded-lg overflow-hidden bg-black">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
               </div>
             )}
           </div>
