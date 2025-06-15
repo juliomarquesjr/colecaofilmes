@@ -19,6 +19,12 @@ interface Genre {
 }
 
 interface MovieWithGenres extends Movie {
+  id: number
+  title: string
+  year: number
+  mediaType: string
+  shelfCode: string
+  rating?: number | null
   genres: Genre[]
 }
 
@@ -185,7 +191,7 @@ export default function FilmesPage() {
   return (
     <div className="mx-auto max-w-[1400px] space-y-8 p-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-indigo-600/10 p-2 text-indigo-400">
             <FilmIcon className="h-6 w-6" />
