@@ -1,18 +1,23 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { type Movie } from "@/generated/prisma/client";
-import { Eye, FilmIcon, Star } from "lucide-react";
+import { Eye, FilmIcon, FolderIcon, Star } from "lucide-react";
 
 interface MoviePreviewModalProps {
-  movie: Movie;
+  movie: Movie & {
+    genres?: {
+      id: number;
+      name: string;
+    }[];
+  };
 }
 
 export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
@@ -28,7 +33,7 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
           Ver
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] bg-zinc-900 text-zinc-100 border border-zinc-800">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-zinc-900 text-zinc-100 border border-zinc-800">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center gap-3 text-white">
             <div className="p-2 rounded-lg bg-indigo-950/50 border border-indigo-900/50">
@@ -41,29 +46,31 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-[200px,1fr] gap-6 mt-6">
+        <div className="grid sm:grid-cols-[180px,1fr] gap-6 mt-6">
           {/* Capa do Filme */}
-          <div className="aspect-[2/3] relative bg-zinc-800 rounded-lg border border-zinc-700 overflow-hidden">
-            {movie.coverUrl ? (
-              <img
-                src={movie.coverUrl}
-                alt={movie.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <FilmIcon className="h-12 w-12 text-zinc-700" />
-              </div>
-            )}
-            {/* Nota do filme */}
-            {movie.rating && (
-              <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded bg-black/60">
-                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                <span className="text-sm font-medium text-yellow-500">
-                  {movie.rating.toFixed(1)}
-                </span>
-              </div>
-            )}
+          <div>
+            <div className="aspect-[2/3] relative bg-zinc-800 rounded-lg border border-zinc-700 overflow-hidden">
+              {movie.coverUrl ? (
+                <img
+                  src={movie.coverUrl}
+                  alt={movie.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <FilmIcon className="h-12 w-12 text-zinc-700" />
+                </div>
+              )}
+              {/* Nota do filme */}
+              {movie.rating && (
+                <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded bg-black/60">
+                  <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                  <span className="text-sm font-medium text-yellow-500">
+                    {movie.rating.toFixed(1)}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Informações do Filme */}
@@ -77,7 +84,7 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="bg-zinc-800">
                 {movie.year}
               </Badge>
@@ -87,17 +94,23 @@ export function MoviePreviewModal({ movie }: MoviePreviewModalProps) {
               <Badge variant="outline" className="bg-zinc-800">
                 Estante: {movie.shelfCode}
               </Badge>
+              {movie.genres && movie.genres.length > 0 && (
+                <Badge variant="outline" className="bg-zinc-800 flex items-center gap-1">
+                  <FolderIcon className="h-3 w-3" />
+                  {movie.genres[0].name}
+                </Badge>
+              )}
             </div>
 
             {movie.overview && (
               <div>
-                <h4 className="text-sm font-medium text-zinc-300 mb-2">Sinopse</h4>
+                <h4 className="text-sm font-medium text-zinc-300 mb-1">Sinopse</h4>
                 <p className="text-sm text-zinc-400">{movie.overview}</p>
               </div>
             )}
 
             <div>
-              <h4 className="text-sm font-medium text-zinc-300 mb-2">
+              <h4 className="text-sm font-medium text-zinc-300 mb-1">
                 Informações de Produção
               </h4>
               <p className="text-sm text-zinc-400">{movie.productionInfo}</p>
