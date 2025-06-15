@@ -1,7 +1,5 @@
 {
-  "/not-found": "app/not-found.js",
+  "/api/generos/route": "app/api/generos/route.js",
   "/filmes/cadastrar/page": "app/filmes/cadastrar/page.js",
-  "/filmes/page": "app/filmes/page.js",
-  "/api/filmes/route": "app/api/filmes/route.js",
-  "/api/generos/route": "app/api/generos/route.js"
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }

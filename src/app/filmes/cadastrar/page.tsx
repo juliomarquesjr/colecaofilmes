@@ -1,5 +1,5 @@
 'use client';
-import { GenreDialog } from '@/components/GenreDialog';
+import { GenreModal } from '@/components/genre-modal';
 import { TMDBSearchModal } from '@/components/tmdb-search-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -145,9 +145,9 @@ export default function CadastrarFilme() {
               <TMDBSearchModal onMovieSelect={handleTMDBSelect} />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit}>
               {error && (
-                <div className="bg-red-950/50 text-red-200 px-4 py-3 rounded-md border border-red-900/50">
+                <div className="bg-red-950/50 text-red-200 px-4 py-3 rounded-md border border-red-900/50 mb-6">
                   {error}
                 </div>
               )}
@@ -167,40 +167,38 @@ export default function CadastrarFilme() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="year" className="text-zinc-300">
-                      Ano
-                    </Label>
-                    <Input
-                      id="year"
-                      name="year"
-                      type="number"
-                      value={form.year}
-                      onChange={handleChange}
-                      className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
-                      placeholder="Ex: 2024"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="year" className="text-zinc-300">
+                    Ano
+                  </Label>
+                  <Input
+                    id="year"
+                    name="year"
+                    type="number"
+                    value={form.year}
+                    onChange={handleChange}
+                    className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                    placeholder="Ex: 2024"
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="mediaType" className="text-zinc-300">
-                      Tipo de Mídia
-                    </Label>
-                    <Select 
-                      value={form.mediaType} 
-                      onValueChange={(value) => setForm({ ...form, mediaType: value })}
-                    >
-                      <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
-                        <SelectValue placeholder="Selecione o tipo" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
-                        <SelectItem value="DVD" className="text-zinc-100 focus:bg-zinc-700">DVD</SelectItem>
-                        <SelectItem value="BluRay" className="text-zinc-100 focus:bg-zinc-700">BluRay</SelectItem>
-                        <SelectItem value="VHS" className="text-zinc-100 focus:bg-zinc-700">VHS</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="mediaType" className="text-zinc-300">
+                    Tipo de Mídia
+                  </Label>
+                  <Select 
+                    value={form.mediaType} 
+                    onValueChange={(value) => setForm({ ...form, mediaType: value })}
+                  >
+                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectItem value="DVD" className="text-zinc-100 focus:bg-zinc-700">DVD</SelectItem>
+                      <SelectItem value="BluRay" className="text-zinc-100 focus:bg-zinc-700">BluRay</SelectItem>
+                      <SelectItem value="VHS" className="text-zinc-100 focus:bg-zinc-700">VHS</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -254,32 +252,34 @@ export default function CadastrarFilme() {
                   <Label htmlFor="genre" className="text-zinc-300">
                     Gênero
                   </Label>
-                  <div className="flex items-center gap-2">
-                    <Select 
-                      value={selectedGenre} 
-                      onValueChange={setSelectedGenre}
-                    >
-                      <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
-                        <SelectValue placeholder="Selecione o gênero" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
-                        {genres.map((genre) => (
-                          <SelectItem 
-                            key={genre.id} 
-                            value={genre.id}
-                            className="text-zinc-100 focus:bg-zinc-700"
-                          >
-                            {genre.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <GenreDialog onGenreAdded={fetchGenres} />
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Select 
+                        value={selectedGenre} 
+                        onValueChange={setSelectedGenre}
+                      >
+                        <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
+                          <SelectValue placeholder="Selecione o gênero" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                          {genres.map((genre) => (
+                            <SelectItem 
+                              key={genre.id} 
+                              value={genre.id}
+                              className="text-zinc-100 focus:bg-zinc-700"
+                            >
+                              {genre.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <GenreModal onGenreAdded={fetchGenres} />
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-4 pt-4">
+              <div className="flex items-center justify-end gap-4 mt-6">
                 <Link href="/filmes">
                   <Button
                     type="button"
