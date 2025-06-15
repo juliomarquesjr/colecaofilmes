@@ -4,6 +4,8 @@ import { z } from 'zod';
 
 const filmeSchema = z.object({
   title: z.string().min(1, 'Título obrigatório'),
+  originalTitle: z.string().optional(),
+  overview: z.string().optional(),
   year: z.number().int().min(1900, 'Ano inválido'),
   mediaType: z.enum(['DVD', 'BluRay', 'VHS']),
   shelfCode: z.string().min(1, 'Código da estante obrigatório'),
@@ -46,6 +48,8 @@ export async function POST(request: Request) {
     const movie = await prisma.movie.create({
       data: {
         title: validatedData.title,
+        originalTitle: validatedData.originalTitle,
+        overview: validatedData.overview,
         year: validatedData.year,
         mediaType: validatedData.mediaType,
         shelfCode: validatedData.shelfCode,

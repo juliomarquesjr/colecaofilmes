@@ -20,6 +20,8 @@ import { z } from 'zod';
 
 const filmeSchema = z.object({
   title: z.string().min(1, 'Título obrigatório'),
+  originalTitle: z.string().optional(),
+  overview: z.string().optional(),
   year: z.coerce.number().int().min(1900, 'Ano inválido'),
   mediaType: z.enum(['DVD', 'BluRay', 'VHS'], { required_error: 'Tipo obrigatório' }),
   shelfCode: z.string().min(1, 'Código da estante obrigatório'),
@@ -36,6 +38,8 @@ export default function CadastrarFilme() {
   const router = useRouter();
   const [form, setForm] = useState({
     title: '',
+    originalTitle: '',
+    overview: '',
     year: '',
     mediaType: 'DVD',
     shelfCode: '',
@@ -106,6 +110,8 @@ export default function CadastrarFilme() {
 
   const handleTMDBSelect = (movieData: {
     title: string;
+    originalTitle: string;
+    overview: string;
     year: number;
     coverUrl: string;
     productionInfo: string;
@@ -113,6 +119,8 @@ export default function CadastrarFilme() {
     setForm({
       ...form,
       title: movieData.title,
+      originalTitle: movieData.originalTitle,
+      overview: movieData.overview,
       year: movieData.year.toString(),
       coverUrl: movieData.coverUrl,
       productionInfo: movieData.productionInfo,
@@ -164,6 +172,35 @@ export default function CadastrarFilme() {
                     onChange={handleChange}
                     className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
                     placeholder="Digite o título do filme"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="originalTitle" className="text-zinc-300">
+                    Título Original
+                  </Label>
+                  <Input
+                    id="originalTitle"
+                    name="originalTitle"
+                    value={form.originalTitle}
+                    onChange={handleChange}
+                    className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
+                    placeholder="Digite o título original do filme"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="overview" className="text-zinc-300">
+                    Sinopse
+                  </Label>
+                  <textarea
+                    id="overview"
+                    name="overview"
+                    value={form.overview}
+                    onChange={handleChange}
+                    rows={4}
+                    className="w-full rounded-md bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800 resize-y"
+                    placeholder="Digite a sinopse do filme"
                   />
                 </div>
 

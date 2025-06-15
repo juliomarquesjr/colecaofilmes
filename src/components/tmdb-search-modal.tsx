@@ -17,6 +17,7 @@ interface TMDBMovie {
   id: number
   title: string
   original_title: string
+  overview: string
   release_date: string
   poster_path: string | null
   production_countries?: { iso_3166_1: string; name: string }[]
@@ -27,6 +28,8 @@ interface TMDBMovie {
 interface TMDBSearchModalProps {
   onMovieSelect: (movieData: {
     title: string
+    originalTitle: string
+    overview: string
     year: number
     coverUrl: string
     productionInfo: string
@@ -91,6 +94,8 @@ export function TMDBSearchModal({ onMovieSelect }: TMDBSearchModalProps) {
     
     onMovieSelect({
       title: movie.title,
+      originalTitle: movie.original_title,
+      overview: movie.overview || '',
       year,
       coverUrl,
       productionInfo: `Produzido em: ${productionCountries}`,
@@ -195,6 +200,11 @@ export function TMDBSearchModal({ onMovieSelect }: TMDBSearchModalProps) {
                           </span>
                         )}
                       </div>
+                      {movie.overview && (
+                        <p className="text-xs text-zinc-400 mt-2 line-clamp-2">
+                          {movie.overview}
+                        </p>
+                      )}
                       {movie.genres && movie.genres.length > 0 && (
                         <div className="mt-2">
                           <p className="text-xs text-zinc-500 mb-1">Gêneros:</p>

@@ -23,6 +23,8 @@ model Genre {
 model Movie {
   id             Int      @id @default(autoincrement())
   title          String
+  originalTitle  String?
+  overview       String?
   year           Int
   mediaType      String // DVD, BluRay, VHS
   shelfCode      String
