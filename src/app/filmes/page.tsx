@@ -21,11 +21,17 @@ interface Genre {
 
 interface MovieWithGenres {
   id: number
+  uniqueCode: string
   title: string
+  originalTitle: string | null
+  overview: string | null
   year: number
   mediaType: string
   shelfCode: string
-  rating?: number | null
+  coverUrl: string
+  productionInfo: string
+  rating: number | null
+  trailerUrl?: string | null
   watchedAt?: Date | null
   genres: Genre[]
 }
@@ -256,13 +262,18 @@ export default function FilmesPage() {
     <div className="mx-auto max-w-[1400px] space-y-8 p-8">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-indigo-600/10 p-2 text-indigo-400">
-            <FilmIcon className="h-6 w-6" />
-          </div>
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-indigo-600/10 p-2 text-indigo-400">
+              <FilmIcon className="h-6 w-6" />
+            </div>
             <h1 className="text-2xl font-bold text-zinc-100">Meus Filmes</h1>
           </div>
+          <MovieStats
+            totalMovies={movies.length}
+            watchedMovies={watchedMovies}
+            compact
+          />
         </div>
 
         <div className="flex items-center gap-2">
@@ -279,7 +290,7 @@ export default function FilmesPage() {
         </div>
       </div>
 
-      {/* Estatísticas */}
+      {/* Estatísticas Detalhadas */}
       <MovieStats
         totalMovies={movies.length}
         watchedMovies={watchedMovies}

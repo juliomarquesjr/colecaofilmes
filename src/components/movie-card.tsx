@@ -58,7 +58,7 @@ export function MovieCard({ movie, onEdit, onDelete, onWatchedToggle }: MovieCar
   }
 
   return (
-    <div className="group relative">
+    <div className="group relative h-full flex flex-col">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -179,7 +179,7 @@ export function MovieCard({ movie, onEdit, onDelete, onWatchedToggle }: MovieCar
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mt-2 space-y-1"
+        className="mt-2 space-y-1 flex-grow"
       >
         <h3 className="text-sm font-medium leading-tight text-zinc-100 line-clamp-1">
           {movie.title}
