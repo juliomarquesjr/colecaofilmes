@@ -2,11 +2,12 @@
 
 import { GenreManagementModal } from "@/components/genre-management-modal"
 import { MovieCard } from "@/components/movie-card"
+import { MovieCardSkeleton } from "@/components/movie-card-skeleton"
 import { MovieFilters } from "@/components/movie-filters"
+import { MovieStats } from "@/components/movie-stats"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { type Movie } from "@/generated/prisma/client"
 import { FilmIcon, Plus, Search } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -18,7 +19,7 @@ interface Genre {
   name: string
 }
 
-interface MovieWithGenres extends Movie {
+interface MovieWithGenres {
   id: number
   title: string
   year: number
@@ -42,6 +43,9 @@ export default function FilmesPage() {
 
   // Obtém os anos únicos dos filmes
   const availableYears = [...new Set(movies.map(movie => movie.year))].sort((a, b) => b - a)
+
+  // Calcula o total de filmes assistidos
+  const watchedMovies = movies.filter(movie => movie.watchedAt).length
 
   useEffect(() => {
     loadMovies()
@@ -181,13 +185,39 @@ export default function FilmesPage() {
             </div>
             <div>
               <div className="h-7 w-32 rounded bg-zinc-800/50 animate-pulse" />
-              <div className="mt-1 h-4 w-24 rounded bg-zinc-800/50 animate-pulse" />
             </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="h-10 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
             <div className="h-10 w-[140px] rounded bg-zinc-800/50 animate-pulse" />
           </div>
+        </div>
+
+        {/* Stats Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          {[...Array(3)].map((_, index) => (
+            <div
+              key={index}
+              className={`bg-zinc-800/50 rounded-lg border border-zinc-700/50 p-6 ${
+                index === 2 ? "sm:col-span-2 lg:col-span-1" : ""
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-zinc-700/50 animate-pulse">
+                  <div className="h-6 w-6" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 w-24 rounded bg-zinc-700/50 animate-pulse" />
+                  <div className="h-8 w-16 rounded bg-zinc-700/50 animate-pulse" />
+                </div>
+              </div>
+              {index === 2 && (
+                <div className="mt-4">
+                  <div className="h-2 w-full rounded-full bg-zinc-700/50 animate-pulse" />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
         {/* Search and Filters Skeleton */}
@@ -232,9 +262,6 @@ export default function FilmesPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-zinc-100">Meus Filmes</h1>
-            <p className="text-sm text-zinc-400">
-              {filteredMovies.length} {filteredMovies.length === 1 ? "filme" : "filmes"} no total
-            </p>
           </div>
         </div>
 
@@ -251,6 +278,12 @@ export default function FilmesPage() {
           </Link>
         </div>
       </div>
+
+      {/* Estatísticas */}
+      <MovieStats
+        totalMovies={movies.length}
+        watchedMovies={watchedMovies}
+      />
 
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
         {/* Barra de Pesquisa */}
