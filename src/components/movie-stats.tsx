@@ -22,17 +22,31 @@ export function MovieStats({ totalMovies, watchedMovies, compact = false }: Movi
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-gradient-to-br from-indigo-950 to-zinc-900 rounded-lg border border-indigo-800/30 p-3 w-[140px]"
+          className={`bg-gradient-to-br ${
+            isComplete 
+              ? 'from-indigo-600 to-indigo-800 border-indigo-500/50 animate-pulse' 
+              : 'from-indigo-950 to-zinc-900 border-indigo-800/30'
+          } rounded-lg border p-3 w-[140px]`}
         >
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-indigo-900/30 border border-indigo-800/30">
-                <FilmIcon className="h-4 w-4 text-indigo-400" />
+              <div className={`p-2 rounded-lg ${
+                isComplete 
+                  ? 'bg-indigo-500/30 border-indigo-400/30' 
+                  : 'bg-indigo-900/30 border-indigo-800/30'
+              } border`}>
+                <FilmIcon className={`h-4 w-4 ${
+                  isComplete ? 'text-indigo-300' : 'text-indigo-400'
+                }`} />
               </div>
-              <span className="text-[11px] font-medium text-zinc-400">Total</span>
+              <span className={`text-[11px] font-medium ${
+                isComplete ? 'text-indigo-200' : 'text-zinc-400'
+              }`}>Total</span>
             </div>
             <div className="flex items-end justify-between">
-              <h3 className="text-2xl font-bold text-white leading-none">{totalMovies}</h3>
+              <h3 className={`text-2xl font-bold ${
+                isComplete ? 'text-indigo-200' : 'text-white'
+              } leading-none`}>{totalMovies}</h3>
               <div className="h-1 w-12 opacity-0" />
             </div>
           </div>
