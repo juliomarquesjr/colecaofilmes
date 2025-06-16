@@ -1,21 +1,21 @@
 'use client'
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { type Movie } from "@/generated/prisma/client"
 import { motion } from "framer-motion"
-import { FilmIcon, MoreVertical, Pencil, Star, Trash2, Youtube } from "lucide-react"
+import { Check, FilmIcon, MoreVertical, Pencil, Star, Trash2, Youtube } from "lucide-react"
 import { useState } from "react"
 import { MoviePreviewModal } from "./movie-preview-modal"
 
@@ -25,12 +25,14 @@ interface MovieCardProps {
       id: number;
       name: string;
     }[];
+    watchedAt?: Date | null;
   }
   onEdit: (id: number) => void
   onDelete: (id: number) => void
+  onWatchedToggle?: (id: number) => Promise<void>
 }
 
-export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
+export function MovieCard({ movie, onEdit, onDelete, onWatchedToggle }: MovieCardProps) {
   const [imageError, setImageError] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -45,32 +47,21 @@ export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
-      className="group relative"
-    >
+    <div className="group relative">
       <motion.div
-        initial={{ scale: 0.95 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.2 }}
-        className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-800 border border-zinc-700"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative aspect-[2/3] overflow-hidden rounded-lg bg-zinc-900 border border-zinc-800"
       >
         {movie.coverUrl ? (
-          <motion.img
-            initial={{ scale: 1.2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
+          <img
             src={movie.coverUrl}
             alt={movie.title}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="h-full w-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:opacity-50"
           />
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <FilmIcon className="h-12 w-12 text-zinc-500" />
+          <div className="flex h-full w-full items-center justify-center">
+            <FilmIcon className="h-12 w-12 text-zinc-700" />
           </div>
         )}
 
@@ -82,7 +73,11 @@ export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
           className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100"
         >
           <div className="flex items-center gap-2">
-            <MoviePreviewModal movie={movie} isLoading={isLoading} />
+            <MoviePreviewModal 
+              movie={movie} 
+              isLoading={isLoading} 
+              onWatchedToggle={onWatchedToggle}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -148,6 +143,21 @@ export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
               </Badge>
             </motion.div>
           )}
+          {movie.watchedAt && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Badge
+                variant="outline"
+                className="bg-black/60 border-emerald-900/50 text-emerald-400 flex items-center gap-1"
+              >
+                <Check className="h-3 w-3" />
+                Assistido
+              </Badge>
+            </motion.div>
+          )}
         </div>
       </motion.div>
 
@@ -195,6 +205,6 @@ export function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </motion.div>
+    </div>
   )
 } 

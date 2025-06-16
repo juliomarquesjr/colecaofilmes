@@ -37,6 +37,7 @@ model Movie {
   country        String   // País de origem
   countryFlag    String?  // Emoji da bandeira do país
   originalLanguage String // Idioma original
+  watchedAt      DateTime? // Data em que o filme foi assistido
   genres         Genre[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

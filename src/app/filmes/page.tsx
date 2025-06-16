@@ -25,6 +25,7 @@ interface MovieWithGenres extends Movie {
   mediaType: string
   shelfCode: string
   rating?: number | null
+  watchedAt?: Date | null
   genres: Genre[]
 }
 
@@ -135,6 +136,39 @@ export default function FilmesPage() {
       toast.error("Erro ao excluir filme")
     }
   }
+
+  const handleWatchedToggle = async (id: number) => {
+    try {
+      console.log('Tentando atualizar status do filme:', id);
+      const response = await fetch(`/api/filmes/${id}/watched`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erro ao atualizar status do filme');
+      }
+
+      const updatedMovie = await response.json();
+      console.log('Filme atualizado:', updatedMovie);
+      
+      // Atualiza o estado local
+      setMovies(prevMovies => 
+        prevMovies.map(movie => 
+          movie.id === id ? { ...movie, watchedAt: updatedMovie.watchedAt } : movie
+        )
+      );
+
+      toast.success(
+        updatedMovie.watchedAt 
+          ? 'Filme marcado como assistido!' 
+          : 'Filme marcado como não assistido!'
+      );
+    } catch (error) {
+      console.error('Erro ao atualizar status do filme:', error);
+      toast.error('Erro ao atualizar status do filme');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -248,42 +282,33 @@ export default function FilmesPage() {
       </div>
 
       {/* Lista de Filmes */}
-      {filteredMovies.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 py-16">
-          <div className="rounded-full bg-zinc-900 p-4">
-            <FilmIcon className="h-8 w-8 text-zinc-600" />
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+        {isLoading ? (
+          <MovieCardSkeleton count={12} />
+        ) : filteredMovies.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-zinc-700 p-8 text-center">
+            <FilmIcon className="h-12 w-12 text-zinc-400" />
+            <div className="max-w-[420px] space-y-1">
+              <h3 className="text-xl font-semibold text-zinc-200">
+                Nenhum filme encontrado
+              </h3>
+              <p className="text-sm text-zinc-400">
+                Não encontramos nenhum filme com os filtros selecionados.
+              </p>
+            </div>
           </div>
-          <div className="text-center">
-            <h3 className="text-lg font-medium text-zinc-100">
-              {movies.length === 0 ? "Nenhum filme cadastrado" : "Nenhum filme encontrado"}
-            </h3>
-            <p className="mt-1 text-sm text-zinc-400">
-              {movies.length === 0
-                ? "Comece adicionando seu primeiro filme ao catálogo."
-                : "Tente ajustar os filtros ou termos da sua pesquisa."}
-            </p>
-          </div>
-          {movies.length === 0 && (
-            <Link href="/filmes/cadastrar">
-              <Button className="bg-indigo-600 text-white hover:bg-indigo-700">
-                <Plus className="mr-2 h-4 w-4" />
-                Adicionar Filme
-              </Button>
-            </Link>
-          )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-          {filteredMovies.map((movie) => (
+        ) : (
+          filteredMovies.map((movie) => (
             <MovieCard
               key={movie.id}
               movie={movie}
               onEdit={() => router.push(`/filmes/${movie.id}/editar`)}
-              onDelete={() => handleDelete(movie.id)}
+              onDelete={handleDelete}
+              onWatchedToggle={handleWatchedToggle}
             />
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   )
 } 

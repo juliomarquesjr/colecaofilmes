@@ -8,8 +8,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
-import { Eye, FilmIcon, FolderIcon, Star, Youtube } from "lucide-react";
+import { Check, Eye, FilmIcon, FolderIcon, Star, Youtube } from "lucide-react";
 import { useState } from "react";
 import { MoviePreviewSkeleton } from "./movie-preview-skeleton";
 import { VideoPlayerModal } from "./video-player-modal";
@@ -28,12 +30,14 @@ interface MoviePreviewModalProps {
     productionInfo: string;
     rating: number | null;
     trailerUrl?: string | null;
+    watchedAt?: Date | null;
     genres?: {
       id: number;
       name: string;
     }[];
   };
   isLoading?: boolean;
+  onWatchedToggle?: (id: number) => Promise<void>;
 }
 
 function getYouTubeVideoId(url: string) {
@@ -73,10 +77,24 @@ const modalVariants = {
   }
 };
 
-export function MoviePreviewModal({ movie, isLoading = false }: MoviePreviewModalProps) {
+export function MoviePreviewModal({ movie, isLoading = false, onWatchedToggle }: MoviePreviewModalProps) {
   const [showTrailer, setShowTrailer] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const videoId = movie.trailerUrl ? getYouTubeVideoId(movie.trailerUrl) : null;
+
+  const handleWatchedToggle = async () => {
+    if (!onWatchedToggle) return;
+    
+    try {
+      setIsUpdating(true);
+      await onWatchedToggle(movie.id);
+    } catch (error) {
+      console.error('Erro ao atualizar status do filme:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   return (
     <>
@@ -192,6 +210,28 @@ export function MoviePreviewModal({ movie, isLoading = false }: MoviePreviewModa
                               </motion.div>
                             )}
                           </div>
+
+                          {/* Botão de Marcar como Assistido */}
+                          <motion.div
+                            initial={{ y: 10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            className="mt-4"
+                          >
+                            <Button
+                              variant="outline"
+                              className={`w-full ${
+                                movie.watchedAt
+                                  ? "bg-emerald-950/50 border-emerald-900/50 text-emerald-400 hover:bg-emerald-950/70"
+                                  : "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-800"
+                              }`}
+                              onClick={handleWatchedToggle}
+                              disabled={isUpdating}
+                            >
+                              <Check className={`h-4 w-4 mr-2 ${movie.watchedAt ? "text-emerald-400" : "text-zinc-400"}`} />
+                              {isUpdating ? "Atualizando..." : movie.watchedAt ? "Assistido" : "Marcar como Assistido"}
+                            </Button>
+                          </motion.div>
                         </motion.div>
 
                         {/* Informações do Filme */}
@@ -238,6 +278,12 @@ export function MoviePreviewModal({ movie, isLoading = false }: MoviePreviewModa
                               <Badge variant="outline" className="bg-red-950/50 border-red-900/50 text-red-400 flex items-center gap-1">
                                 <Youtube className="h-3 w-3" />
                                 Trailer Disponível
+                              </Badge>
+                            )}
+                            {movie.watchedAt && (
+                              <Badge variant="outline" className="bg-emerald-950/50 border-emerald-900/50 text-emerald-400 flex items-center gap-1">
+                                <Check className="h-3 w-3" />
+                                Assistido em {format(new Date(movie.watchedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                               </Badge>
                             )}
                           </motion.div>
