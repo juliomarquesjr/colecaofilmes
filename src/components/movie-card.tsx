@@ -1,14 +1,14 @@
 'use client'
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -41,9 +41,11 @@ interface MovieCardProps {
   onEdit: (id: number) => void
   onDelete: (id: number) => void
   onWatchedToggle?: (id: number) => Promise<void>
+  totalMovies: number
+  watchedMovies: number
 }
 
-export function MovieCard({ movie, onEdit, onDelete, onWatchedToggle }: MovieCardProps) {
+export function MovieCard({ movie, onEdit, onDelete, onWatchedToggle, totalMovies, watchedMovies }: MovieCardProps) {
   const [imageError, setImageError] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -88,6 +90,8 @@ export function MovieCard({ movie, onEdit, onDelete, onWatchedToggle }: MovieCar
               movie={movie} 
               isLoading={isLoading} 
               onWatchedToggle={onWatchedToggle}
+              totalMovies={totalMovies}
+              watchedMovies={watchedMovies}
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

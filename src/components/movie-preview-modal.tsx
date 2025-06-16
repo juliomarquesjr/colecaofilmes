@@ -1,18 +1,19 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
+import { useConfetti } from "@/hooks/useConfetti";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Eye, FilmIcon, FolderIcon, Star, Youtube } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MoviePreviewSkeleton } from "./movie-preview-skeleton";
 import { VideoPlayerModal } from "./video-player-modal";
 
@@ -38,10 +39,13 @@ interface MoviePreviewModalProps {
   };
   isLoading?: boolean;
   onWatchedToggle?: (id: number) => Promise<void>;
+  totalMovies?: number;
+  watchedMovies?: number;
 }
 
-function getYouTubeVideoId(url: string) {
-  const match = url.match(/[?&]v=([^&]+)/);
+function extractYouTubeId(url: string): string | null {
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = url.match(regex);
   return match ? match[1] : null;
 }
 
@@ -77,24 +81,47 @@ const modalVariants = {
   }
 };
 
-export function MoviePreviewModal({ movie, isLoading = false, onWatchedToggle }: MoviePreviewModalProps) {
-  const [showTrailer, setShowTrailer] = useState(false);
+export function MoviePreviewModal({ 
+  movie, 
+  isLoading = false, 
+  onWatchedToggle,
+  totalMovies = 0,
+  watchedMovies = 0,
+}: MoviePreviewModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const videoId = movie.trailerUrl ? getYouTubeVideoId(movie.trailerUrl) : null;
+  const [showTrailer, setShowTrailer] = useState(false);
+  const [isWatched, setIsWatched] = useState(!!movie.watchedAt);
+  const [isTogglingWatched, setIsTogglingWatched] = useState(false);
+  const { fireConfetti } = useConfetti();
+
+  const videoId = movie.trailerUrl ? extractYouTubeId(movie.trailerUrl) : null;
 
   const handleWatchedToggle = async () => {
-    if (!onWatchedToggle) return;
+    if (!onWatchedToggle || isTogglingWatched) return;
     
+    setIsTogglingWatched(true);
     try {
-      setIsUpdating(true);
       await onWatchedToggle(movie.id);
-    } catch (error) {
-      console.error('Erro ao atualizar status do filme:', error);
+      setIsWatched(!isWatched);
+      
+      // Calcula se atingirá 100% após marcar este filme
+      const newWatchedCount = !isWatched ? watchedMovies + 1 : watchedMovies - 1;
+      const newPercentage = totalMovies > 0 
+        ? Math.round((newWatchedCount / totalMovies) * 100) 
+        : 0;
+
+      // Dispara confetes apenas se atingir 100% ao marcar como assistido
+      if (newPercentage === 100 && !isWatched) {
+        fireConfetti();
+      }
     } finally {
-      setIsUpdating(false);
+      setIsTogglingWatched(false);
     }
   };
+
+  useEffect(() => {
+    setIsWatched(!!movie.watchedAt);
+  }, [movie.watchedAt]);
 
   return (
     <>
@@ -226,10 +253,10 @@ export function MoviePreviewModal({ movie, isLoading = false, onWatchedToggle }:
                                   : "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-800"
                               }`}
                               onClick={handleWatchedToggle}
-                              disabled={isUpdating}
+                              disabled={isTogglingWatched}
                             >
                               <Check className={`h-4 w-4 mr-2 ${movie.watchedAt ? "text-emerald-400" : "text-zinc-400"}`} />
-                              {isUpdating ? "Atualizando..." : movie.watchedAt ? "Assistido" : "Marcar como Assistido"}
+                              {isTogglingWatched ? "Atualizando..." : movie.watchedAt ? "Assistido" : "Marcar como Assistido"}
                             </Button>
                           </motion.div>
                         </motion.div>

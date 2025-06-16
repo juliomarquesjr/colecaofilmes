@@ -2,7 +2,6 @@
 
 import { GenreManagementModal } from "@/components/genre-management-modal"
 import { MovieCard } from "@/components/movie-card"
-import { MovieCardSkeleton } from "@/components/movie-card-skeleton"
 import { MovieFilters } from "@/components/movie-filters"
 import { MovieStats } from "@/components/movie-stats"
 import { Button } from "@/components/ui/button"
@@ -168,12 +167,6 @@ export default function FilmesPage() {
           movie.id === id ? { ...movie, watchedAt: updatedMovie.watchedAt } : movie
         )
       );
-
-      toast.success(
-        updatedMovie.watchedAt 
-          ? 'Filme marcado como assistido!' 
-          : 'Filme marcado como não assistido!'
-      );
     } catch (error) {
       console.error('Erro ao atualizar status do filme:', error);
       toast.error('Erro ao atualizar status do filme');
@@ -326,32 +319,18 @@ export default function FilmesPage() {
       </div>
 
       {/* Lista de Filmes */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-        {isLoading ? (
-          <MovieCardSkeleton count={12} />
-        ) : filteredMovies.length === 0 ? (
-          <div className="col-span-full flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-zinc-700 p-8 text-center">
-            <FilmIcon className="h-12 w-12 text-zinc-400" />
-            <div className="max-w-[420px] space-y-1">
-              <h3 className="text-xl font-semibold text-zinc-200">
-                Nenhum filme encontrado
-              </h3>
-              <p className="text-sm text-zinc-400">
-                Não encontramos nenhum filme com os filtros selecionados.
-              </p>
-            </div>
-          </div>
-        ) : (
-          filteredMovies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              onEdit={() => router.push(`/filmes/${movie.id}/editar`)}
-              onDelete={handleDelete}
-              onWatchedToggle={handleWatchedToggle}
-            />
-          ))
-        )}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        {filteredMovies.map((movie) => (
+          <MovieCard
+            key={movie.id}
+            movie={movie}
+            onEdit={(id) => router.push(`/filmes/${id}/editar`)}
+            onDelete={handleDelete}
+            onWatchedToggle={handleWatchedToggle}
+            totalMovies={movies.length}
+            watchedMovies={watchedMovies}
+          />
+        ))}
       </div>
     </div>
   )
