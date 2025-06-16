@@ -215,7 +215,7 @@ export default function EditarFilme() {
       year: movieData.year.toString(),
       coverUrl: movieData.coverUrl,
       productionInfo: movieData.productionInfo,
-      rating: movieData.rating.toString(),
+      rating: Number(movieData.rating.toFixed(1)).toString(),
       runtime: movieData.runtime?.toString() || '',
       country: movieData.country || '',
       countryFlag: movieData.countryFlag || '',
