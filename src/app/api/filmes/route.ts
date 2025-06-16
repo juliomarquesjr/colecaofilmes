@@ -21,17 +21,21 @@ const filmeSchema = z.object({
   originalLanguage: z.string().min(1, 'Idioma original obrigatório'),
 });
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const unwatched = searchParams.get("unwatched") === "true";
+
     const movies = await prisma.movie.findMany({
       where: {
         deletedAt: null,
+        watchedAt: unwatched ? null : undefined,
       },
       include: {
         genres: true,
       },
       orderBy: {
-        createdAt: "desc",
+        title: "asc",
       },
     });
 
