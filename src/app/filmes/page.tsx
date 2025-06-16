@@ -177,62 +177,54 @@ export default function FilmesPage() {
     return (
       <div className="mx-auto max-w-[1400px] space-y-8 p-8">
         {/* Header Skeleton */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-zinc-800/50 p-2">
-              <div className="h-6 w-6 rounded bg-zinc-700/50 animate-pulse" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-zinc-800/50 p-2">
+                <div className="h-6 w-6 rounded bg-zinc-700/50 animate-pulse" />
+              </div>
+              <div className="h-8 w-36 rounded bg-zinc-800/50 animate-pulse" />
             </div>
-            <div>
-              <div className="h-7 w-32 rounded bg-zinc-800/50 animate-pulse" />
+            {/* Stats compactos */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 rounded bg-zinc-800/50 animate-pulse" />
+                <div className="h-5 w-28 rounded bg-zinc-800/50 animate-pulse" />
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 rounded bg-zinc-800/50 animate-pulse" />
+                <div className="h-5 w-28 rounded bg-zinc-800/50 animate-pulse" />
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="h-10 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
-            <div className="h-10 w-[140px] rounded bg-zinc-800/50 animate-pulse" />
+            <div className="h-10 w-[180px] rounded bg-zinc-800/50 animate-pulse" />
+            <div className="h-10 w-[160px] rounded bg-zinc-800/50 animate-pulse" />
           </div>
         </div>
 
-        {/* Stats Skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {[...Array(3)].map((_, index) => (
-            <div
-              key={index}
-              className={`bg-zinc-800/50 rounded-lg border border-zinc-700/50 p-6 ${
-                index === 2 ? "sm:col-span-2 lg:col-span-1" : ""
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-zinc-700/50 animate-pulse">
-                  <div className="h-6 w-6" />
-                </div>
-                <div className="space-y-2">
-                  <div className="h-4 w-24 rounded bg-zinc-700/50 animate-pulse" />
-                  <div className="h-8 w-16 rounded bg-zinc-700/50 animate-pulse" />
-                </div>
-              </div>
-              {index === 2 && (
-                <div className="mt-4">
-                  <div className="h-2 w-full rounded-full bg-zinc-700/50 animate-pulse" />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
 
         {/* Search and Filters Skeleton */}
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-          <div className="h-11 w-full rounded bg-zinc-800/50 animate-pulse" />
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 rounded bg-zinc-700/50 animate-pulse" />
+            <div className="h-11 w-full rounded bg-zinc-800/50 animate-pulse" />
+          </div>
           <div className="my-4 h-[1px] bg-zinc-800" />
           <div className="flex flex-wrap gap-2">
-            <div className="h-9 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
-            <div className="h-9 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
-            <div className="h-9 w-[120px] rounded bg-zinc-800/50 animate-pulse" />
+            {/* Filtro de Gênero */}
+            <div className="h-9 w-[180px] rounded bg-zinc-800/50 animate-pulse" />
+            {/* Filtro de Ano */}
+            <div className="h-9 w-[140px] rounded bg-zinc-800/50 animate-pulse" />
+            {/* Filtro de Nota */}
+            <div className="h-9 w-[140px] rounded bg-zinc-800/50 animate-pulse" />
+            {/* Botão Limpar */}
             <div className="h-9 w-[100px] rounded bg-zinc-800/50 animate-pulse" />
           </div>
         </div>
 
         {/* Movies Grid Skeleton */}
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {[...Array(12)].map((_, index) => (
             <div key={index} className="group relative">
               <div className="aspect-[2/3] w-full overflow-hidden rounded-lg bg-zinc-800/50 animate-pulse" />
