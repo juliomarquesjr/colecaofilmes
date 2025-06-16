@@ -1,31 +1,42 @@
 'use client'
 
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { type Movie } from "@/generated/prisma/client"
 import { motion } from "framer-motion"
 import { Check, FilmIcon, MoreVertical, Pencil, Star, Trash2, Youtube } from "lucide-react"
 import { useState } from "react"
 import { MoviePreviewModal } from "./movie-preview-modal"
 
 interface MovieCardProps {
-  movie: Movie & {
+  movie: {
+    id: number;
+    uniqueCode: string;
+    title: string;
+    originalTitle: string | null;
+    overview: string | null;
+    year: number;
+    mediaType: string;
+    shelfCode: string;
+    coverUrl: string;
+    productionInfo: string;
+    rating: number | null;
+    trailerUrl?: string | null;
+    watchedAt?: Date | null;
     genres?: {
       id: number;
       name: string;
     }[];
-    watchedAt?: Date | null;
   }
   onEdit: (id: number) => void
   onDelete: (id: number) => void
@@ -143,22 +154,25 @@ export function MovieCard({ movie, onEdit, onDelete, onWatchedToggle }: MovieCar
               </Badge>
             </motion.div>
           )}
-          {movie.watchedAt && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Badge
-                variant="outline"
-                className="bg-black/60 border-emerald-900/50 text-emerald-400 flex items-center gap-1"
-              >
-                <Check className="h-3 w-3" />
-                Assistido
-              </Badge>
-            </motion.div>
-          )}
         </div>
+
+        {/* Badge de Assistido */}
+        {movie.watchedAt && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.4 }}
+            className="absolute left-2 bottom-2"
+          >
+            <Badge
+              variant="outline"
+              className="bg-black/60 border-emerald-900/50 text-emerald-400 flex items-center gap-1"
+            >
+              <Check className="h-3 w-3" />
+              Assistido
+            </Badge>
+          </motion.div>
+        )}
       </motion.div>
 
       <motion.div
