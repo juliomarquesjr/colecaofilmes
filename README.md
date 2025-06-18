@@ -1,103 +1,165 @@
-# Catálogo de Filmes Pessoais
+# 🎬 Coleção de Filmes
 
-Aplicativo para cadastro e gerenciamento interno de filmes, com visual amigável e API integrada.
+Uma aplicação web moderna para gerenciar sua coleção pessoal de filmes e séries. Desenvolvida com Next.js 14, TypeScript e Prisma.
 
-## Objetivo
-Permitir o registro, consulta e visualização de filmes pessoais, com dados completos e reais.
+![Vercel Deploy Status](https://therealsujitk-vercel-badge.vercel.app/?app=colecaofilmes)
 
-## Como usar
+## 📋 Funcionalidades
 
-1. Instale as dependências:
-   ```bash
-   npm install
-   ```
-2. Rode as migrations e gere o banco:
-   ```bash
-   npx prisma migrate dev
-   ```
-3. Inicie o servidor de desenvolvimento:
-   ```bash
-   npm run dev
-   ```
-4. Acesse `http://localhost:3000` no navegador.
+- ✨ Interface moderna e responsiva com Tailwind CSS e shadcn/ui
+- 📝 Cadastro completo de filmes com:
+  - Título original e traduzido
+  - Ano de lançamento
+  - Tipo de mídia (DVD, BluRay, VHS)
+  - Código da estante
+  - Capa do filme
+  - Informações de produção
+  - Avaliação (0-10)
+  - Trailer (integração com YouTube)
+  - Duração
+  - País de origem
+  - Idioma original
+- 🎲 Roleta de filmes para escolha aleatória
+- 🔍 Busca e filtros avançados
+- 📊 Estatísticas da coleção
+- 🎯 Integração com TMDB para importação de dados
+- 🗃️ Gerenciamento de gêneros
+- ✅ Marcação de filmes assistidos
 
-## Funcionalidades
-- Cadastro de filme com título, ano, tipo (DVD, BluRay, VHS), código da estante, capa (URL) e informações de produção
-- Listagem de filmes cadastrados
-- Validação de dados com mensagens claras
-- Verificação de duplicidade (título, ano, tipo)
+## 🛠️ Tecnologias
 
-## API
-### Listar filmes
-`GET /api/filmes`
+- **Frontend**
+  - Next.js 14
+  - TypeScript
+  - Tailwind CSS
+  - shadcn/ui
+  - Framer Motion
+  - Lucide Icons
+  - Sonner (toasts)
 
-Retorna todos os filmes cadastrados (exceto removidos logicamente).
+- **Backend**
+  - Next.js API Routes
+  - Prisma ORM
+  - PostgreSQL
+  - Zod (validação)
 
-### Cadastrar filme
-`POST /api/filmes`
+- **Integrações**
+  - TMDB API
+  - YouTube API
 
-Body (JSON):
-```json
-{
-  "title": "O Senhor dos Anéis: A Sociedade do Anel",
-  "year": 2001,
-  "mediaType": "DVD",
-  "shelfCode": "A1",
-  "coverUrl": "https://...",
-  "productionInfo": "Peter Jackson, New Line Cinema"
-}
+## 🚀 Começando
+
+### Pré-requisitos
+
+- Node.js 18+
+- PostgreSQL
+- Conta no TMDB para API Key
+
+### Instalação
+
+1. Clone o repositório
+```bash
+git clone https://github.com/seu-usuario/colecaofilmes.git
+cd colecaofilmes
 ```
 
-Respostas:
-- 201: Filme cadastrado
-- 409: Já existe filme igual
-- 400: Dados inválidos
+2. Instale as dependências
+```bash
+npm install
+```
 
-## Campos obrigatórios
-- Título (string)
-- Ano (número, >= 1900)
-- Tipo (DVD, BluRay, VHS)
-- Código da estante (string)
-- URL da capa (string, url)
-- Informações de produção (string)
+3. Configure as variáveis de ambiente
+```bash
+# .env
+DATABASE_URL="postgresql://user:password@localhost:5432/colecaofilmes"
+TMDB_ACCESS_TOKEN="seu_token_aqui"
+```
 
-## Observações
-- Remoção lógica implementada (campo `deletedAt`)
-- Todos os dados devem ser reais e completos
+4. Execute as migrações do banco de dados
+```bash
+npx prisma migrate dev
+```
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
+5. Inicie o servidor de desenvolvimento
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Estrutura do Projeto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+colecaofilmes/
+├── src/
+│   ├── app/              # Rotas e páginas
+│   ├── components/       # Componentes React
+│   ├── lib/             # Utilitários e configurações
+│   └── hooks/           # Custom hooks
+├── prisma/              # Schema e migrações
+└── public/             # Arquivos estáticos
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔄 Convenções de Commit
 
-## Learn More
+- `feat`: nova funcionalidade
+- `fix`: correção de bug
+- `docs`: alteração na documentação
+- `refactor`: refatoramento de código
+- `style`: ajustes de estilo
+- `test`: adição/modificação de testes
+- `chore`: outras mudanças
 
-To learn more about Next.js, take a look at the following resources:
+## 📝 Boas Práticas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Validação de dados com Zod
+- Tratamento de erros consistente
+- Código limpo e bem documentado
+- Commits padronizados
+- Desenvolvimento incremental
+- Proteção contra duplicação de dados
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🌐 Deploy
 
-## Deploy on Vercel
+O projeto está configurado para deploy automático na Vercel:
+[https://colecaofilmes.vercel.app](https://colecaofilmes.vercel.app)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📈 Roadmap
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **MVP** ✅
+   - Cadastro básico de filmes
+   - Listagem e visualização
+
+2. **Admin** ✅
+   - Autenticação
+   - CRUD completo
+
+3. **Visual e Estilo** ✅
+   - Interface moderna
+   - Animações
+
+4. **Pesquisa e Filtragem** ✅
+   - Busca avançada
+   - Filtros por gênero/ano
+
+5. **API** ✅
+   - Endpoints documentados
+   - Integração TMDB
+
+## 👥 Contribuindo
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'feat: Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 🙏 Agradecimentos
+
+- [Next.js](https://nextjs.org)
+- [Prisma](https://prisma.io)
+- [TMDB](https://www.themoviedb.org)
+- [shadcn/ui](https://ui.shadcn.com)
+- [Vercel](https://vercel.com)
