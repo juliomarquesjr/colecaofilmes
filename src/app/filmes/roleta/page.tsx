@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { ArrowLeft, Clapperboard, Film, Star } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { toast } from "sonner"
 
 interface Genre {
@@ -30,6 +30,20 @@ interface Movie {
 }
 
 export default function RouletteMoviePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-zinc-900 to-indigo-900 p-8">
+        <div className="mx-auto max-w-4xl text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">Carregando...</h1>
+        </div>
+      </div>
+    }>
+      <RouletteContent />
+    </Suspense>
+  )
+}
+
+function RouletteContent() {
   const searchParams = useSearchParams()
   const selectedGenres = searchParams.getAll("genres").map(Number)
   
@@ -90,8 +104,8 @@ export default function RouletteMoviePage() {
   }
 
   // Função para formatar a URL do YouTube para embed
-  const getEmbedUrl = (url: string | null) => {
-    if (!url) return null
+  const getEmbedUrl = (url: string | null): string | undefined => {
+    if (!url) return undefined
     
     try {
       // Tenta extrair o ID do vídeo de diferentes formatos de URL do YouTube
@@ -105,13 +119,13 @@ export default function RouletteMoviePage() {
         videoId = url.split("youtube.com/embed/")[1]?.split("?")[0] || ""
       }
       
-      if (!videoId) return null
+      if (!videoId) return undefined
       
       // Retorna a URL de embed com parâmetros adicionais
       return `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1`
     } catch (error) {
       console.error("Erro ao processar URL do trailer:", error)
-      return null
+      return undefined
     }
   }
 
