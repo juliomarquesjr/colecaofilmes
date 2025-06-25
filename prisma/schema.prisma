@@ -9,6 +9,9 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Se precisar usar SQLite em desenvolvimento, comente a linha acima e descomente a linha abaixo
+  // provider = "sqlite"
+  // url      = "file:./dev.db"
 }
 
 model Genre {
