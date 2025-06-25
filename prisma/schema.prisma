@@ -3,15 +3,11 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // Se precisar usar SQLite em desenvolvimento, comente a linha acima e descomente a linha abaixo
-  // provider = "sqlite"
-  // url      = "file:./dev.db"
 }
 
 model Genre {
@@ -45,4 +41,17 @@ model Movie {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   deletedAt      DateTime? // Remoção lógica
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique // Campo para login
+  name      String
+  address   String
+  phone     String
+  password  String   // Será armazenado com hash
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 }

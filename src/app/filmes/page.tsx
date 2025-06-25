@@ -8,7 +8,7 @@ import { MovieStats } from "@/components/movie-stats"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Dice1, FilmIcon, Plus, Search } from "lucide-react"
+import { Dice1, Plus, Search } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -181,12 +181,6 @@ export default function FilmesPage() {
         {/* Header Skeleton */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-zinc-800/50 p-2">
-                <div className="h-6 w-6 rounded bg-zinc-700/50 animate-pulse" />
-              </div>
-              <div className="h-8 w-36 rounded bg-zinc-800/50 animate-pulse" />
-            </div>
             {/* Stats compactos */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -204,7 +198,6 @@ export default function FilmesPage() {
             <div className="h-10 w-[160px] rounded bg-zinc-800/50 animate-pulse" />
           </div>
         </div>
-
 
         {/* Search and Filters Skeleton */}
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
@@ -250,12 +243,6 @@ export default function FilmesPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-indigo-600/10 p-2 text-indigo-400">
-              <FilmIcon className="h-6 w-6" />
-            </div>
-            <h1 className="text-2xl font-bold text-zinc-100">Meus Filmes</h1>
-          </div>
           <MovieStats
             totalMovies={movies.length}
             watchedMovies={watchedMovies}
