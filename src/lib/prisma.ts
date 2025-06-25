@@ -1,18 +1,33 @@
-import { PrismaClient } from '../generated/prisma'
+import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient }
+declare global {
+  var prisma: PrismaClient | undefined
+}
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
+const prismaClientSingleton = () => {
+  return new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    errorFormat: 'pretty',
   })
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+export const prisma = globalThis.prisma ?? prismaClientSingleton()
 
-// Tratamento de erro de conexão
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prisma = prisma
+}
+
+// Tratamento de reconexão
 prisma.$connect()
-  .catch((error) => {
+  .then(() => {
+    console.log('Conectado ao banco de dados com sucesso')
+  })
+  .catch((error: Error) => {
     console.error('Erro ao conectar com o banco de dados:', error)
     process.exit(1)
-  }) 
+  })
+
+// Tratamento de desconexão
+process.on('beforeExit', () => {
+  void prisma.$disconnect()
+}) 
