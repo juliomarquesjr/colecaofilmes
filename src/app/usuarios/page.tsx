@@ -1,13 +1,24 @@
 'use client';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserManagementModal } from "@/components/user-management-modal";
 import { motion } from "framer-motion";
 import { Edit2Icon, Plus, Shield, ShieldAlert, Trash2Icon, UserIcon, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
+import Loading from "./loading";
 
 interface User {
   id: number;
@@ -18,9 +29,10 @@ interface User {
   isAdmin: boolean;
 }
 
-export default function UsersPage() {
+function UsersContent() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -35,9 +47,15 @@ export default function UsersPage() {
     }
   };
 
-  const handleDelete = async (userId: number) => {
+  const handleDelete = async (user: User) => {
+    setUserToDelete(user);
+  };
+
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/api/users/${userToDelete.id}`, {
         method: "DELETE"
       });
       if (!response.ok) throw new Error("Erro ao excluir usuário");
@@ -45,6 +63,8 @@ export default function UsersPage() {
       toast.success("Usuário excluído com sucesso");
     } catch (error) {
       toast.error("Erro ao excluir usuário");
+    } finally {
+      setUserToDelete(null);
     }
   };
 
@@ -52,49 +72,14 @@ export default function UsersPage() {
     fetchUsers();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="mx-auto max-w-[1400px] space-y-8 p-8">
-        {/* Header Skeleton */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-zinc-800/50 animate-pulse">
-              <div className="h-6 w-6 rounded bg-zinc-700/50" />
-            </div>
-            <div className="h-8 w-36 rounded bg-zinc-800/50 animate-pulse" />
-          </div>
-          <div className="h-10 w-[160px] rounded bg-zinc-800/50 animate-pulse" />
-        </div>
-
-        {/* Stats Skeleton */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="p-6 rounded-lg bg-zinc-900/50 border border-zinc-800 animate-pulse">
-              <div className="h-4 w-24 bg-zinc-800 rounded mb-2" />
-              <div className="h-8 w-16 bg-zinc-800 rounded" />
-            </div>
-          ))}
-        </div>
-
-        {/* Table Skeleton */}
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 overflow-hidden">
-          <div className="p-4 border-b border-zinc-800 animate-pulse">
-            <div className="h-8 w-full bg-zinc-800/50 rounded" />
-          </div>
-          <div className="p-4 space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 bg-zinc-800/50 rounded animate-pulse" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Calcular estatísticas
   const totalUsers = users.length;
   const adminUsers = users.filter(user => user.isAdmin).length;
   const regularUsers = totalUsers - adminUsers;
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-8 p-8">
@@ -214,7 +199,7 @@ export default function UsersPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDelete(user.id)}
+                      onClick={() => handleDelete(user)}
                       className="bg-red-950/30 border-red-900/30 text-red-400 hover:bg-red-950/50 hover:text-red-300"
                     >
                       <Trash2Icon className="h-3 w-3" />
@@ -226,6 +211,40 @@ export default function UsersPage() {
           </TableBody>
         </Table>
       </motion.div>
+
+      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-zinc-100">Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              Tem certeza que deseja excluir o usuário "{userToDelete?.name}"?
+              Esta ação não poderá ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => setUserToDelete(null)}
+              className="bg-zinc-800 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:text-white"
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
+  );
+}
+
+export default function UsersPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <UsersContent />
+    </Suspense>
   );
 } 
