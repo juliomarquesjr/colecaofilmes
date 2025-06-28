@@ -9,6 +9,16 @@
 - Filtros por texto, gênero, ano, nota
 - Ações rápidas: editar, excluir, marcar como assistido
 - Visualização rápida em modal
+- **Paginação Avançada:**
+  - Navegação inteligente com elipses (Desktop: 1 2 3 ... 15, Mobile: simplificada)
+  - Barra de progresso visual com animação durante carregamento
+  - Contador de páginas dinâmico (ex: 3/15)
+  - Atalhos rápidos "Primeira" e "Última" página
+  - Navegação por teclado (←→ para páginas, Home/End para extremos)
+  - Estados de loading com spinners individuais
+  - Overlay de carregamento na grid de filmes
+  - Seletor de itens por página (12, 24, 36, 48)
+  - Informações detalhadas ("Mostrando 1 a 12 de 150 filmes")
 
 ## 3. Cadastro/Edição de Filme
 - Formulário completo
