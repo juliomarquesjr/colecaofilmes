@@ -7,6 +7,21 @@ import { MovieRouletteModal } from "@/components/movie-roulette-modal"
 import { MovieStats } from "@/components/movie-stats"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Dice1, Plus, Search } from "lucide-react"
 import Link from "next/link"
@@ -47,6 +62,9 @@ export default function FilmesPage() {
   const [selectedYear, setSelectedYear] = useState("all")
   const [selectedRating, setSelectedRating] = useState("all")
   const [isRouletteOpen, setIsRouletteOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(12)
+  const [totalMovies, setTotalMovies] = useState(0)
 
   // Obtém os anos únicos dos filmes
   const availableYears = [...new Set(movies.map(movie => movie.year))].sort((a, b) => b - a)
@@ -57,7 +75,7 @@ export default function FilmesPage() {
   useEffect(() => {
     loadMovies()
     loadGenres()
-  }, [])
+  }, [currentPage, itemsPerPage])
 
   useEffect(() => {
     filterMovies()
@@ -77,11 +95,12 @@ export default function FilmesPage() {
 
   async function loadMovies() {
     try {
-      const res = await fetch("/api/filmes")
+      const res = await fetch(`/api/filmes?page=${currentPage}&limit=${itemsPerPage}`)
       if (!res.ok) throw new Error("Erro ao carregar filmes")
       const data = await res.json()
-      setMovies(data)
-      setFilteredMovies(data)
+      setMovies(data.movies)
+      setFilteredMovies(data.movies) // Initially, filtered movies are the same as loaded movies
+      setTotalMovies(data.totalMovies)
     } catch (error) {
       console.error("Erro ao carregar filmes:", error)
       toast.error("Erro ao carregar filmes")
@@ -320,6 +339,59 @@ export default function FilmesPage() {
             watchedMovies={watchedMovies}
           />
         ))}
+      </div>
+
+      {/* Paginação */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-zinc-400">
+          Filmes por página:
+          <Select
+            value={itemsPerPage.toString()}
+            onValueChange={(value) => {
+              setItemsPerPage(parseInt(value));
+              setCurrentPage(1); // Reset to first page when items per page changes
+            }}
+          >
+            <SelectTrigger className="w-[80px] bg-zinc-800 border-zinc-700 text-zinc-100">
+              <SelectValue placeholder={itemsPerPage} />
+            </SelectTrigger>
+            <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
+              <SelectItem value="12">12</SelectItem>
+              <SelectItem value="24">24</SelectItem>
+              <SelectItem value="36">36</SelectItem>
+              <SelectItem value="48">48</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined}
+              />
+            </PaginationItem>
+            {[...Array(Math.ceil(totalMovies / itemsPerPage))].map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  href="#"
+                  isActive={currentPage === index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={() => setCurrentPage((prev) => Math.min(Math.ceil(totalMovies / itemsPerPage), prev + 1))}
+                className={currentPage === Math.ceil(totalMovies / itemsPerPage) ? "pointer-events-none opacity-50" : undefined}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
 
       <MovieRouletteModal

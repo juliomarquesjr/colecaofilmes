@@ -2,8 +2,9 @@
 
 ## Gestão de Filmes
 
-### Cadastro de Filmes
+### Cadastro e Edição de Filmes
 - Cada filme deve ter um código único de 8 dígitos
+- **Seleção de Múltiplos Gêneros:** É possível associar um filme a múltiplos gêneros.
 - Informações obrigatórias:
   - Título
   - Ano
@@ -30,6 +31,10 @@
 - Funcionalidade de controle pessoal
 - Registra a data em que o filme foi assistido
 - Não há regras específicas ou restrições para marcação
+
+### Listagem de Filmes
+- **Paginação:** A listagem de filmes agora suporta paginação, permitindo navegar por grandes coleções.
+- **Controle de Itens por Página:** O usuário pode selecionar a quantidade de filmes exibidos por página (opções incluem 12, 24, 36, 48).
 
 ## Roleta de Filmes
 

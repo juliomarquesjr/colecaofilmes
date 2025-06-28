@@ -25,21 +25,33 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const unwatched = searchParams.get("unwatched") === "true";
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "12");
+    const skip = (page - 1) * limit;
 
-    const movies = await prisma.movie.findMany({
-      where: {
-        deletedAt: null,
-        watchedAt: unwatched ? null : undefined,
-      },
-      include: {
-        genres: true,
-      },
-      orderBy: {
-        title: "asc",
-      },
-    });
+    const whereClause = {
+      deletedAt: null,
+      watchedAt: unwatched ? null : undefined,
+    };
 
-    return NextResponse.json(movies);
+    const [movies, totalMovies] = await prisma.$transaction([
+      prisma.movie.findMany({
+        where: whereClause,
+        include: {
+          genres: true,
+        },
+        orderBy: {
+          title: "asc",
+        },
+        take: limit,
+        skip: skip,
+      }),
+      prisma.movie.count({
+        where: whereClause,
+      }),
+    ]);
+
+    return NextResponse.json({ movies, totalMovies });
   } catch (error) {
     console.error('Erro ao buscar filmes:', error);
     return NextResponse.json(

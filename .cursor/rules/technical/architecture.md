@@ -12,7 +12,7 @@ src/
 │   ├── usuarios/          # Páginas de gestão de usuários
 │   └── login/             # Página de autenticação
 ├── components/            # Componentes React reutilizáveis
-│   ├── ui/               # Componentes base (botões, inputs, etc)
+│   ├── ui/               # Componentes base (botões, inputs, paginação, etc)
 │   └── [outros]/         # Componentes específicos do domínio
 ├── hooks/                 # Hooks React customizados
 └── lib/                   # Utilitários e configurações
@@ -33,6 +33,7 @@ model Movie {
   uniqueCode     String    @unique
   title          String
   originalTitle  String?
+  genres         Genre[]   // Relação muitos-para-muitos com Gênero
   // ... outros campos
 }
 
@@ -46,7 +47,7 @@ model User {
 model Genre {
   id        Int       @id @default(autoincrement())
   name      String    @unique
-  movies    Movie[]
+  movies    Movie[]   // Relação muitos-para-muitos com Filme
   // ... outros campos
 }
 ```
@@ -57,6 +58,13 @@ model Genre {
 - Autenticação baseada em credenciais (username/password)
 - Sessões gerenciadas pelo NextAuth
 - Dois níveis de acesso: Admin e Usuário comum
+
+### API Routes
+- **Filmes:**
+  - A rota GET (`/api/filmes`) agora suporta paginação via parâmetros `page` e `limit`, retornando também o total de filmes.
+  - As rotas POST (`/api/filmes`) e PUT (`/api/filmes/[id]`) agora aceitam um array de `genreIds` para associar múltiplos gêneros a um filme.
+- **Gêneros:** Rotas para criação, edição e exclusão lógica de gêneros.
+- **Usuários:** Rotas para gestão de usuários.
 
 ## Integrações
 
