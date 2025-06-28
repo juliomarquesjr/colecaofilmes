@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { useDebounce } from "@/hooks/use-debounce"
 import { cn } from "@/lib/utils"
 import { Dice1, Loader2, Plus, Search } from "lucide-react"
 import Link from "next/link"
@@ -62,6 +63,7 @@ export default function FilmesPage() {
   const [selectedGenre, setSelectedGenre] = useState("all")
   const [selectedYear, setSelectedYear] = useState("all")
   const [selectedRating, setSelectedRating] = useState("all")
+  const [selectedMediaType, setSelectedMediaType] = useState("all")
   const [isRouletteOpen, setIsRouletteOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(12)
@@ -70,6 +72,10 @@ export default function FilmesPage() {
   const [keyboardNavigation, setKeyboardNavigation] = useState(false)
   const [isPageLoading, setIsPageLoading] = useState(false)
   const [loadingPage, setLoadingPage] = useState<number | null>(null)
+  const [isSearchLoading, setIsSearchLoading] = useState(false)
+
+  // Debounce da pesquisa para evitar muitas requisições
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
   // Obtém os anos únicos dos filmes
   const availableYears = [...new Set(movies.map(movie => movie.year))].sort((a, b) => b - a)
@@ -92,11 +98,14 @@ export default function FilmesPage() {
   useEffect(() => {
     loadMovies()
     loadGenres()
-  }, [currentPage, itemsPerPage])
+  }, [currentPage, itemsPerPage, debouncedSearchTerm, selectedGenre, selectedYear, selectedRating, selectedMediaType])
 
+  // Reset página quando pesquisa mudar
   useEffect(() => {
-    filterMovies()
-  }, [searchTerm, selectedGenre, selectedYear, selectedRating, movies])
+    if (debouncedSearchTerm !== searchTerm && searchTerm !== "") {
+      setCurrentPage(1)
+    }
+  }, [debouncedSearchTerm])
 
   useEffect(() => {
     // Navegação por teclado
@@ -154,12 +163,41 @@ export default function FilmesPage() {
 
   async function loadMovies() {
     try {
-      setIsPageLoading(true)
-      const res = await fetch(`/api/filmes?page=${currentPage}&limit=${itemsPerPage}`)
+      // Define qual tipo de loading mostrar
+      if (debouncedSearchTerm !== searchTerm || currentPage === 1) {
+        setIsSearchLoading(true)
+      } else {
+        setIsPageLoading(true)
+      }
+
+      // Constrói os parâmetros da URL
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: itemsPerPage.toString(),
+      })
+
+      if (debouncedSearchTerm) {
+        params.append('search', debouncedSearchTerm)
+      }
+      if (selectedGenre !== 'all') {
+        params.append('genreId', selectedGenre)
+      }
+      if (selectedYear !== 'all') {
+        params.append('year', selectedYear)
+      }
+      if (selectedRating !== 'all') {
+        params.append('rating', selectedRating)
+      }
+      if (selectedMediaType !== 'all') {
+        params.append('mediaType', selectedMediaType)
+      }
+
+      const res = await fetch(`/api/filmes?${params.toString()}`)
       if (!res.ok) throw new Error("Erro ao carregar filmes")
       const data = await res.json()
+      
       setMovies(data.movies)
-      setFilteredMovies(data.movies) // Initially, filtered movies are the same as loaded movies
+      setFilteredMovies(data.movies) // Com pesquisa global, não precisamos filtrar localmente
       setTotalMovies(data.totalMovies)
     } catch (error) {
       console.error("Erro ao carregar filmes:", error)
@@ -167,48 +205,12 @@ export default function FilmesPage() {
     } finally {
       setIsLoading(false)
       setIsPageLoading(false)
+      setIsSearchLoading(false)
       setLoadingPage(null)
     }
   }
 
-  const filterMovies = () => {
-    let filtered = [...movies]
 
-    // Filtro por texto
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase()
-      filtered = filtered.filter((movie) =>
-        movie.title.toLowerCase().includes(searchLower) ||
-        movie.mediaType.toLowerCase().includes(searchLower) ||
-        movie.shelfCode.toLowerCase().includes(searchLower) ||
-        movie.year.toString().includes(searchLower)
-      )
-    }
-
-    // Filtro por gênero
-    if (selectedGenre !== "all") {
-      filtered = filtered.filter((movie) =>
-        movie.genres.some((genre) => genre.id.toString() === selectedGenre)
-      )
-    }
-
-    // Filtro por ano
-    if (selectedYear !== "all") {
-      filtered = filtered.filter((movie) => 
-        movie.year.toString() === selectedYear
-      )
-    }
-
-    // Filtro por nota
-    if (selectedRating !== "all") {
-      const minRating = parseInt(selectedRating.replace("+", ""))
-      filtered = filtered.filter((movie) => 
-        movie.rating && movie.rating >= minRating
-      )
-    }
-
-    setFilteredMovies(filtered)
-  }
 
   const navigateToPage = async (page: number) => {
     if (page === currentPage || isPageLoading) return
@@ -236,6 +238,29 @@ export default function FilmesPage() {
     setSelectedGenre("all")
     setSelectedYear("all")
     setSelectedRating("all")
+    setSelectedMediaType("all")
+    setCurrentPage(1) // Reset para primeira página ao limpar filtros
+  }
+
+  // Handlers para resetar página quando filtros mudarem
+  const handleGenreChange = (value: string) => {
+    setSelectedGenre(value)
+    setCurrentPage(1)
+  }
+
+  const handleYearChange = (value: string) => {
+    setSelectedYear(value)
+    setCurrentPage(1)
+  }
+
+  const handleRatingChange = (value: string) => {
+    setSelectedRating(value)
+    setCurrentPage(1)
+  }
+
+  const handleMediaTypeChange = (value: string) => {
+    setSelectedMediaType(value)
+    setCurrentPage(1)
   }
 
   const handleDelete = async (id: number) => {
@@ -383,13 +408,22 @@ export default function FilmesPage() {
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
         {/* Barra de Pesquisa */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+          <Search className={cn(
+            "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors duration-200",
+            isSearchLoading ? "text-indigo-500" : "text-zinc-500"
+          )} />
+          {isSearchLoading && (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-indigo-500" />
+          )}
           <Input
             type="text"
             placeholder="Buscar por título, ano, mídia ou código..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 h-11 bg-zinc-800/50 border-zinc-700 text-zinc-100 focus-visible:ring-1 focus-visible:ring-indigo-500"
+            className={cn(
+              "pl-9 h-11 bg-zinc-800/50 border-zinc-700 text-zinc-100 focus-visible:ring-1 focus-visible:ring-indigo-500 transition-all duration-200",
+              isSearchLoading && "pr-10 border-indigo-500/50"
+            )}
           />
         </div>
 
@@ -401,9 +435,11 @@ export default function FilmesPage() {
           selectedGenre={selectedGenre}
           selectedYear={selectedYear}
           selectedRating={selectedRating}
-          onGenreChange={setSelectedGenre}
-          onYearChange={setSelectedYear}
-          onRatingChange={setSelectedRating}
+          selectedMediaType={selectedMediaType}
+          onGenreChange={handleGenreChange}
+          onYearChange={handleYearChange}
+          onRatingChange={handleRatingChange}
+          onMediaTypeChange={handleMediaTypeChange}
           onClearFilters={handleClearFilters}
           availableYears={availableYears}
         />
@@ -411,39 +447,90 @@ export default function FilmesPage() {
 
       {/* Lista de Filmes */}
       <div className="relative">
-        {/* Overlay de carregamento */}
-        {isPageLoading && (
+        {/* Overlay de carregamento - apenas quando há filmes ou é carregamento inicial */}
+        {(isPageLoading || isSearchLoading) && (filteredMovies.length > 0 || isLoading) && (
           <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
             <div className="flex flex-col items-center gap-3 text-zinc-100">
               <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-              <div className="text-sm font-medium">Carregando filmes...</div>
+              <div className="text-sm font-medium">
+                {isSearchLoading ? "Pesquisando filmes..." : "Carregando filmes..."}
+              </div>
               <div className="text-xs text-zinc-400">
-                Página {loadingPage || currentPage}
+                {isSearchLoading ? "Aplicando filtros" : `Página ${loadingPage || currentPage}`}
               </div>
             </div>
           </div>
         )}
         
-        <div className={cn(
-          "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 transition-opacity duration-200",
-          isPageLoading && "opacity-50"
-        )}>
-          {filteredMovies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              onEdit={(id) => router.push(`/filmes/${id}/editar`)}
-              onDelete={handleDelete}
-              onWatchedToggle={handleWatchedToggle}
-              totalMovies={movies.length}
-              watchedMovies={watchedMovies}
-            />
-          ))}
-        </div>
+        {/* Loading para lista vazia durante pesquisa */}
+        {(isSearchLoading || isPageLoading) && filteredMovies.length === 0 && !isLoading && (
+          <div className="flex flex-col items-center justify-center py-16 text-zinc-400">
+            <Loader2 className="h-8 w-8 animate-spin text-indigo-500 mb-4" />
+            <div className="text-sm font-medium text-zinc-100">
+              {isSearchLoading ? "Pesquisando filmes..." : "Carregando filmes..."}
+            </div>
+            <div className="text-xs text-zinc-500 mt-1">
+              {isSearchLoading ? "Aplicando filtros" : `Página ${loadingPage || currentPage}`}
+            </div>
+          </div>
+        )}
+        
+        {/* Grid de filmes */}
+        {filteredMovies.length > 0 && (
+          <div className={cn(
+            "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 transition-opacity duration-200",
+            (isPageLoading || isSearchLoading) && "opacity-50"
+          )}>
+            {filteredMovies.map((movie) => (
+              <MovieCard
+                key={movie.id}
+                movie={movie}
+                onEdit={(id) => router.push(`/filmes/${id}/editar`)}
+                onDelete={handleDelete}
+                onWatchedToggle={handleWatchedToggle}
+                totalMovies={movies.length}
+                watchedMovies={watchedMovies}
+              />
+            ))}
+          </div>
+        )}
+        
+        {/* Estado vazio - nenhum resultado encontrado */}
+        {!isLoading && !isSearchLoading && !isPageLoading && filteredMovies.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-zinc-400">
+            <div className="text-6xl mb-4">🎬</div>
+            <h3 className="text-lg font-medium text-zinc-100 mb-2">
+              Nenhum filme encontrado
+            </h3>
+            <p className="text-sm text-zinc-500 text-center max-w-md mb-6">
+              {searchTerm || selectedGenre !== "all" || selectedYear !== "all" || selectedRating !== "all" || selectedMediaType !== "all"
+                ? "Não encontramos filmes que correspondam aos filtros aplicados. Tente ajustar os critérios de pesquisa."
+                : "Sua coleção está vazia. Que tal adicionar alguns filmes?"}
+            </p>
+            <div className="flex gap-3">
+              {(searchTerm || selectedGenre !== "all" || selectedYear !== "all" || selectedRating !== "all" || selectedMediaType !== "all") && (
+                <Button
+                  variant="outline"
+                  onClick={handleClearFilters}
+                  className="bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:text-white"
+                >
+                  Limpar Filtros
+                </Button>
+              )}
+              <Link href="/filmes/cadastrar">
+                <Button className="bg-indigo-600 text-white hover:bg-indigo-700">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar Filme
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Paginação */}
-      <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
+      {/* Paginação - apenas quando há resultados */}
+      {totalMovies > 0 && (
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           {/* Informações e Controle de Itens por Página */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -863,18 +950,19 @@ export default function FilmesPage() {
           )}
         </div>
         
-        {/* Dica sobre atalhos de teclado */}
-        {Math.ceil(totalMovies / itemsPerPage) > 1 && (
-          <div className="mt-3 pt-3 border-t border-zinc-800">
-            <div className={cn(
-              "flex items-center justify-center text-xs transition-colors duration-300",
-              keyboardNavigation ? "text-indigo-400" : "text-zinc-500"
-            )}>
-              💡 Use as setas ← → para navegar, Home/End para primeira/última página
+          {/* Dica sobre atalhos de teclado */}
+          {Math.ceil(totalMovies / itemsPerPage) > 1 && (
+            <div className="mt-3 pt-3 border-t border-zinc-800">
+              <div className={cn(
+                "flex items-center justify-center text-xs transition-colors duration-300",
+                keyboardNavigation ? "text-indigo-400" : "text-zinc-500"
+              )}>
+                💡 Use as setas ← → para navegar, Home/End para primeira/última página
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       <MovieRouletteModal
         genres={genres}
