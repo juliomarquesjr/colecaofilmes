@@ -28,11 +28,56 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "12");
     const skip = (page - 1) * limit;
+    
+    // Novos parâmetros de pesquisa e filtros
+    const search = searchParams.get("search") || "";
+    const genreId = searchParams.get("genreId");
+    const year = searchParams.get("year");
+    const rating = searchParams.get("rating");
+    const mediaType = searchParams.get("mediaType");
 
-    const whereClause = {
+    const whereClause: any = {
       deletedAt: null,
       watchedAt: unwatched ? null : undefined,
     };
+
+    // Filtro de pesquisa por texto
+    if (search) {
+      whereClause.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { originalTitle: { contains: search, mode: 'insensitive' } },
+        { shelfCode: { contains: search, mode: 'insensitive' } },
+        { mediaType: { contains: search, mode: 'insensitive' } },
+        { year: { equals: isNaN(parseInt(search)) ? undefined : parseInt(search) } },
+      ].filter(condition => condition.year?.equals !== undefined || Object.keys(condition).length > 0);
+    }
+
+    // Filtro por gênero
+    if (genreId && genreId !== "all") {
+      whereClause.genres = {
+        some: {
+          id: parseInt(genreId)
+        }
+      };
+    }
+
+    // Filtro por ano
+    if (year && year !== "all") {
+      whereClause.year = parseInt(year);
+    }
+
+    // Filtro por nota
+    if (rating && rating !== "all") {
+      const minRating = parseInt(rating.replace("+", ""));
+      whereClause.rating = {
+        gte: minRating
+      };
+    }
+
+    // Filtro por tipo de mídia
+    if (mediaType && mediaType !== "all") {
+      whereClause.mediaType = mediaType;
+    }
 
     const [movies, totalMovies] = await prisma.$transaction([
       prisma.movie.findMany({

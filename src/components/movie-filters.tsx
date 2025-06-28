@@ -18,9 +18,11 @@ interface MovieFiltersProps {
   selectedGenre: string;
   selectedYear: string;
   selectedRating: string;
+  selectedMediaType: string;
   onGenreChange: (value: string) => void;
   onYearChange: (value: string) => void;
   onRatingChange: (value: string) => void;
+  onMediaTypeChange: (value: string) => void;
   onClearFilters: () => void;
   availableYears: number[];
 }
@@ -30,9 +32,11 @@ export function MovieFilters({
   selectedGenre,
   selectedYear,
   selectedRating,
+  selectedMediaType,
   onGenreChange,
   onYearChange,
   onRatingChange,
+  onMediaTypeChange,
   onClearFilters,
   availableYears,
 }: MovieFiltersProps) {
@@ -40,6 +44,12 @@ export function MovieFilters({
     { value: "4+", label: "4+ ⭐" },
     { value: "6+", label: "6+ ⭐" },
     { value: "8+", label: "8+ ⭐" },
+  ];
+
+  const mediaTypeOptions = [
+    { value: "DVD", label: "📀 DVD" },
+    { value: "BluRay", label: "💿 Blu-ray" },
+    { value: "VHS", label: "📼 VHS" },
   ];
 
   return (
@@ -107,6 +117,29 @@ export function MovieFilters({
               Todas as notas
             </SelectItem>
             {ratingOptions.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="text-zinc-100 focus:bg-zinc-700"
+              >
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Filtro por Tipo de Mídia */}
+      <div className="flex-1 min-w-[200px]">
+        <Select value={selectedMediaType} onValueChange={onMediaTypeChange}>
+          <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
+            <SelectValue placeholder="🎬 Filtrar por mídia" />
+          </SelectTrigger>
+          <SelectContent className="bg-zinc-800 border-zinc-700">
+            <SelectItem value="all" className="text-zinc-100 focus:bg-zinc-700">
+              Todas as mídias
+            </SelectItem>
+            {mediaTypeOptions.map((option) => (
               <SelectItem
                 key={option.value}
                 value={option.value}

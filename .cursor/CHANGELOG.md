@@ -8,10 +8,67 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ## [Não Lançado]
 
 ### Adicionado
-- Documentação completa das melhorias no modal de preview
+- Pesquisa global na base de dados (server-side)
+- Filtro por tipo de mídia (DVD, Blu-ray, VHS)
+- Sistema de loading inteligente e contextual
+- Estado vazio com mensagens e ações contextuais
+- Documentação completa das melhorias na pesquisa
 
 ### Alterado
-- Layout do modal de preview otimizado para melhor aproveitamento do espaço
+- Migração de filtro local para pesquisa server-side
+- API de filmes atualizada com múltiplos filtros
+- Estados de loading diferenciados (pesquisa vs paginação)
+- Paginação condicional (só aparece quando há resultados)
+
+### Melhorado
+- Performance da pesquisa com filtros server-side
+- UX de loading sem elementos "boiando no nada"
+- Feedback visual durante pesquisa com debounce otimizado
+- Reset automático da página ao mudar filtros
+
+### Corrigido
+- Loading overlay aparecendo em lista vazia
+- Pesquisa limitada aos filmes carregados na página
+- Paginação desnecessária quando não há resultados
+
+## [2024-12-19] - Melhorias na Pesquisa Global com Filtros e Loading
+
+### Adicionado
+- Sistema de pesquisa global server-side em toda a base de dados
+- Filtro por tipo de mídia (DVD, Blu-ray, VHS) com emojis visuais
+- Estados de loading diferenciados e contextuais
+- Loading específico para lista vazia durante pesquisa
+- Estado vazio inteligente com mensagens contextuais
+- Indicador visual de loading no campo de pesquisa
+- Debounce otimizado de 300ms para pesquisa
+- Reset automático da página ao alterar filtros
+
+### Alterado
+- API `/api/filmes` expandida com filtros server-side
+- Migração de filtro client-side para server-side
+- Interface `MovieFiltersProps` com novo filtro de mídia
+- Lógica de loading com estados separados (`isPageLoading` vs `isSearchLoading`)
+- Paginação agora é condicional (só aparece com resultados)
+
+### Melhorado
+- Performance da pesquisa com filtros aplicados no servidor
+- UX de loading sem overlay "boiando no nada"
+- Feedback visual durante pesquisa (ícone muda de cor, spinner aparece)
+- Experiência de usuário com 5 estados distintos de loading/resultado
+- Precisão da pesquisa expandida para toda a coleção
+
+### Corrigido
+- Loading overlay aparecendo inadequadamente em listas vazias
+- Pesquisa limitada apenas aos filmes carregados na página atual
+- Paginação sendo exibida mesmo sem resultados
+- Falta de feedback visual durante estados de transição
+
+### Técnico
+- Implementação de debounce com hook personalizado `useDebounce`
+- Prisma queries otimizadas com transações para busca e contagem
+- Estados de loading inteligentes com condicionais específicas
+- Handlers específicos para cada filtro com reset de página
+- TypeScript interfaces atualizadas mantendo compatibilidade
 
 ## [2024-12-19] - Melhorias no Modal de Preview
 
