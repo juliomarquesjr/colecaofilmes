@@ -113,6 +113,15 @@ xl: '1280px'
 - Spinners quando apropriado
 - Feedback de progresso
 
+### Paginação Avançada
+- **Navegação Inteligente**: Elipses automáticas baseadas na quantidade de páginas
+- **Responsividade**: Desktop (até 7 páginas visíveis) vs Mobile (3 páginas)
+- **Estados de Loading**: Spinners individuais para cada controle
+- **Barra de Progresso**: Gradiente animado durante carregamento
+- **Overlay de Carregamento**: Backdrop blur com indicador central
+- **Navegação por Teclado**: Suporte completo com tooltips informativos
+- **Feedback Contextual**: Contador dinâmico e informações detalhadas
+
 ### Notificações
 - Sistema de toast para mensagens
 - Alertas contextuais

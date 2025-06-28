@@ -6,7 +6,7 @@
 - **Tailwind CSS**: Utilitários de estilo
 - **shadcn/ui**: Componentes de UI acessíveis e customizáveis
 - **Framer Motion**: Animações
-- **Lucide Icons**: Ícones
+- **Lucide Icons**: Ícones (incluindo Loader2 para estados de loading)
 - **Sonner**: Toasts e notificações
 
 ## Backend
@@ -18,6 +18,13 @@
 ## Integrações
 - **TMDB API**: Busca e importação de filmes
 - **YouTube API**: Busca de trailers
+
+## Recursos de UX Avançados
+- **Paginação Inteligente**: Lógica adaptativa para diferentes quantidades de dados
+- **Estados de Loading**: Sistema completo de feedback visual durante carregamentos
+- **Navegação por Teclado**: Acessibilidade completa com atalhos personalizados
+- **Responsividade Contextual**: Adaptação automática mobile/desktop
+- **Feedback Visual Progressivo**: Barras de progresso, overlays e spinners coordenados
 
 ## Outras Ferramentas
 - **Vercel**: Deploy e hospedagem
