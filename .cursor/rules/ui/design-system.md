@@ -50,6 +50,15 @@ O projeto utiliza componentes base do Radix UI, estilizados com Tailwind CSS:
 - Autocompletar quando apropriado
 - Máscaras de entrada quando necessário
 
+#### MultiSelect Customizado
+- **Altura Padrão**: `min-h-9` (36px) - Alinhado com inputs padrão
+- **Tipografia**: `text-sm` - Consistente com o sistema
+- **Padding**: `px-3 py-1` - Padrão para campos de entrada
+- **Centralização**: `items-center` para alinhamento vertical perfeito
+- **Placeholder**: Posicionamento preciso com `py-1 mt-0.5`
+- **Cores**: Segue paleta zinc para consistência visual
+- **Estados**: Hover, focus e selected com feedback visual claro
+
 ## Padrões de Layout
 
 ### Estrutura Comum

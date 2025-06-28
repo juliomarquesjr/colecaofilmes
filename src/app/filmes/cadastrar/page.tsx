@@ -256,7 +256,10 @@ export default function CadastrarFilme() {
                         <p className="text-sm text-zinc-400">Busque e adicione o trailer as informações fime</p>
                       </div>
                     </div>
-                    <YouTubeSearchModal onVideoSelect={(url) => setForm({ ...form, trailerUrl: url })} />
+                    <YouTubeSearchModal 
+                      onVideoSelect={(url) => setForm({ ...form, trailerUrl: url })} 
+                      initialSearchTerm={form.title && form.year ? `${form.title} ${form.year} trailer` : ''}
+                    />
                   </div>
                 </AnimatedCard>
               </div>
@@ -413,7 +416,10 @@ export default function CadastrarFilme() {
                             id="shelfCode"
                             name="shelfCode"
                             value={form.shelfCode}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                              const value = e.target.value.toUpperCase();
+                              setForm({ ...form, shelfCode: value });
+                            }}
                             className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
                             placeholder="Digite o código"
                           />
@@ -438,20 +444,20 @@ export default function CadastrarFilme() {
                         </div>
                       </div>
 
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="genres">Gêneros</Label>
-                          <div className="flex gap-2">
-                            <div className="flex-1">
-                              <MultiSelect
-                                options={genres.map(genre => ({ value: genre.id.toString(), label: genre.name }))}
-                                selected={selectedGenres}
-                                onChange={setSelectedGenres}
-                                placeholder="Selecione os gêneros..."
-                              />
-                            </div>
-                            <GenreModal onGenreAdded={fetchGenres} />
+                      <div className="space-y-2">
+                        <Label htmlFor="genre" className="text-zinc-300">
+                          Gênero
+                        </Label>
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <MultiSelect
+                              options={genres.map(genre => ({ value: genre.id.toString(), label: genre.name }))}
+                              selected={selectedGenres}
+                              onChange={setSelectedGenres}
+                              placeholder="Selecione os gêneros..."
+                            />
                           </div>
+                          <GenreModal onGenreAdded={fetchGenres} />
                         </div>
                       </div>
 
