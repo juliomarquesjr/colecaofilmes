@@ -12,7 +12,7 @@ const filmeSchema = z.object({
   coverUrl: z.string().url('URL da capa inválida'),
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.number().min(0).max(10).optional(),
-  genreId: z.number().optional(),
+  genreIds: z.array(z.number()).min(1, 'Selecione pelo menos um gênero'),
   uniqueCode: z.string().length(8, 'Código único deve ter 8 caracteres'),
   trailerUrl: z.string().url('URL do trailer inválida').optional(),
   runtime: z.number().int().min(1, 'Duração inválida').optional(),
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     const data = await request.json();
     const validatedData = filmeSchema.parse({
       ...data,
-      genreId: data.genreId ? parseInt(data.genreId) : undefined
+      genreIds: Array.isArray(data.genreIds) ? data.genreIds.map((id: any) => parseInt(id as string)) : []
     });
 
     // Verifica se o código já existe
@@ -86,9 +86,9 @@ export async function POST(request: Request) {
         country: validatedData.country,
         countryFlag: validatedData.countryFlag,
         originalLanguage: validatedData.originalLanguage,
-        genres: validatedData.genreId ? {
-          connect: [{ id: validatedData.genreId }]
-        } : undefined,
+        genres: {
+          connect: validatedData.genreIds.map(id => ({ id }))
+        },
       },
       include: {
         genres: true,
