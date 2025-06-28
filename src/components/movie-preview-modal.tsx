@@ -240,15 +240,15 @@ export function MoviePreviewModal({
                             <Button
                               variant="outline"
                               className={`w-full ${
-                                movie.watchedAt
+                                isWatched
                                   ? "bg-emerald-950/50 border-emerald-900/50 text-emerald-400 hover:bg-emerald-950/70"
                                   : "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-800"
                               }`}
                               onClick={handleWatchedToggle}
                               disabled={isTogglingWatched}
                             >
-                              <Check className={`h-4 w-4 mr-2 ${movie.watchedAt ? "text-emerald-400" : "text-zinc-400"}`} />
-                              {isTogglingWatched ? "Atualizando..." : movie.watchedAt ? "Assistido" : "Marcar como Assistido"}
+                              <Check className={`h-4 w-4 mr-2 ${isWatched ? "text-emerald-400" : "text-zinc-400"}`} />
+                              {isTogglingWatched ? "Atualizando..." : isWatched ? "Assistido" : "Marcar como Assistido"}
                             </Button>
 
                             {/* Botão de Editar */}
@@ -317,10 +317,10 @@ export function MoviePreviewModal({
                                 Trailer Disponível
                               </Badge>
                             )}
-                            {movie.watchedAt && (
+                            {isWatched && (
                               <Badge variant="outline" className="bg-emerald-950/50 border-emerald-900/50 text-emerald-400 flex items-center gap-1">
                                 <Check className="h-3 w-3" />
-                                Assistido em {format(new Date(movie.watchedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                                Assistido{movie.watchedAt ? ` em ${format(new Date(movie.watchedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}` : ''}
                               </Badge>
                             )}
                           </motion.div>
