@@ -38,9 +38,10 @@ interface Video {
 
 interface YouTubeSearchModalProps {
   onVideoSelect: (videoUrl: string) => void;
+  initialSearchTerm?: string;
 }
 
-export function YouTubeSearchModal({ onVideoSelect }: YouTubeSearchModalProps) {
+export function YouTubeSearchModal({ onVideoSelect, initialSearchTerm = "" }: YouTubeSearchModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [videos, setVideos] = useState<Video[]>([]);
@@ -53,6 +54,13 @@ export function YouTubeSearchModal({ onVideoSelect }: YouTubeSearchModalProps) {
       handleSearch();
     }
   }, [debouncedQuery]);
+
+  // Definir o termo inicial quando o modal abrir
+  useEffect(() => {
+    if (isOpen && initialSearchTerm && !query) {
+      setQuery(initialSearchTerm);
+    }
+  }, [isOpen, initialSearchTerm]);
 
   const handleSearch = async () => {
     if (!debouncedQuery.trim()) {

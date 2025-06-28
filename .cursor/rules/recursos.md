@@ -25,6 +25,10 @@
 - **Navegação por Teclado**: Acessibilidade completa com atalhos personalizados
 - **Responsividade Contextual**: Adaptação automática mobile/desktop
 - **Feedback Visual Progressivo**: Barras de progresso, overlays e spinners coordenados
+- **MultiSelect Customizado**: Componente alinhado com design system (36px altura)
+- **Máscaras de Entrada**: Transformação automática (ex: maiúsculo para códigos)
+- **Busca Contextual**: YouTube e TMDB com preenchimento automático baseado em dados
+- **Integração Inteligente**: APIs externas com UX otimizada
 
 ## Outras Ferramentas
 - **Vercel**: Deploy e hospedagem

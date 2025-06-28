@@ -9,11 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MultiSelect, Option } from '@/components/ui/multi-select';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { VideoPlayerModal } from '@/components/video-player-modal';
@@ -284,7 +284,10 @@ export default function EditarFilme() {
                         <p className="text-sm text-zinc-400">Busque e adicione o trailer as informações fime</p>
                       </div>
                     </div>
-                    <YouTubeSearchModal onVideoSelect={(url) => setForm({ ...form, trailerUrl: url })} />
+                    <YouTubeSearchModal 
+                      onVideoSelect={(url) => setForm({ ...form, trailerUrl: url })} 
+                      initialSearchTerm={form.title && form.year ? `${form.title} ${form.year} trailer` : ''}
+                    />
                   </div>
                 </AnimatedCard>
               </div>
@@ -431,7 +434,10 @@ export default function EditarFilme() {
                             id="shelfCode"
                             name="shelfCode"
                             value={form.shelfCode}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                              const value = e.target.value.toUpperCase();
+                              setForm({ ...form, shelfCode: value });
+                            }}
                             className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800"
                             placeholder="Digite o código"
                           />
