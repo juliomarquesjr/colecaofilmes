@@ -90,6 +90,7 @@ export function MovieCard({ movie, onEdit, onDelete, onWatchedToggle, totalMovie
               movie={movie} 
               isLoading={isLoading} 
               onWatchedToggle={onWatchedToggle}
+              onEdit={onEdit}
               totalMovies={totalMovies}
               watchedMovies={watchedMovies}
             />

@@ -26,6 +26,16 @@ O projeto é uma aplicação web moderna para gerenciamento de uma coleção pes
   - Responsividade
   - Acessibilidade
 
+- `/timeline`: Histórico de desenvolvimento
+  - Implementações e melhorias
+  - Documentação de mudanças
+  - Análises técnicas detalhadas
+
+## Documentação de Mudanças
+
+- `CHANGELOG.md`: Registro cronológico de todas as alterações
+- `timeline/`: Documentação detalhada de implementações específicas
+
 ## Stack Principal
 
 - **Frontend**: Next.js 14.1.0
