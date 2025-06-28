@@ -38,6 +38,11 @@ O projeto utiliza componentes base do Radix UI, estilizados com Tailwind CSS:
 
 #### Modais
 - `MoviePreviewModal`: Visualização detalhada do filme
+  - **Layout Otimizado**: Grid 2 colunas (capa + informações)
+  - **Múltiplos Gêneros**: Seção dedicada exibindo todos os gêneros
+  - **Ações Organizadas**: Botões posicionados abaixo da capa
+  - **Funcionalidades**: Assistido, Editar, Trailer
+  - **Responsivo**: Adaptável a diferentes tamanhos de tela
 - `GenreManagementModal`: Gestão de categorias
 - `UserManagementModal`: Gestão de usuários
 - `TMDBSearchModal`: Busca na API do TMDB

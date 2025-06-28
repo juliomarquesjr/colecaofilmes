@@ -12,7 +12,7 @@ import { useConfetti } from "@/hooks/useConfetti";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Eye, FilmIcon, FolderIcon, Star, Youtube } from "lucide-react";
+import { Check, Eye, FilmIcon, FolderIcon, Pencil, Star, Youtube } from "lucide-react";
 import { useEffect, useState } from "react";
 import { MoviePreviewSkeleton } from "./movie-preview-skeleton";
 import { VideoPlayerModal } from "./video-player-modal";
@@ -39,6 +39,7 @@ interface MoviePreviewModalProps {
   };
   isLoading?: boolean;
   onWatchedToggle?: (id: number) => Promise<void>;
+  onEdit?: (id: number) => void;
   totalMovies?: number;
   watchedMovies?: number;
 }
@@ -85,6 +86,7 @@ export function MoviePreviewModal({
   movie, 
   isLoading = false, 
   onWatchedToggle,
+  onEdit,
   totalMovies = 0,
   watchedMovies = 0,
 }: MoviePreviewModalProps) {
@@ -116,6 +118,13 @@ export function MoviePreviewModal({
       }
     } finally {
       setIsTogglingWatched(false);
+    }
+  };
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(movie.id);
+      setIsOpen(false);
     }
   };
 
@@ -218,33 +227,16 @@ export function MoviePreviewModal({
                                 </span>
                               </motion.div>
                             )}
-                            {/* Indicador de Trailer */}
-                            {movie.trailerUrl && videoId && (
-                              <motion.div
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.3 }}
-                                className="absolute bottom-2 left-2 right-2"
-                              >
-                                <Button
-                                  variant="outline"
-                                  className="w-full bg-black/60 border-zinc-700 hover:bg-black/80 text-zinc-100"
-                                  onClick={() => setShowTrailer(true)}
-                                >
-                                  <Youtube className="h-4 w-4 mr-2 text-red-500" />
-                                  Assistir Trailer
-                                </Button>
-                              </motion.div>
-                            )}
                           </div>
 
-                          {/* Botão de Marcar como Assistido */}
+                          {/* Ações do Filme - Movido para abaixo da capa */}
                           <motion.div
                             initial={{ y: 10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                            className="mt-4"
+                            transition={{ delay: 0.5 }}
+                            className="flex flex-col gap-3 mt-4"
                           >
+                            {/* Botão de Marcar como Assistido */}
                             <Button
                               variant="outline"
                               className={`w-full ${
@@ -258,6 +250,30 @@ export function MoviePreviewModal({
                               <Check className={`h-4 w-4 mr-2 ${movie.watchedAt ? "text-emerald-400" : "text-zinc-400"}`} />
                               {isTogglingWatched ? "Atualizando..." : movie.watchedAt ? "Assistido" : "Marcar como Assistido"}
                             </Button>
+
+                            {/* Botão de Editar */}
+                            {onEdit && (
+                              <Button
+                                variant="outline"
+                                className="w-full bg-blue-950/50 border-blue-900/50 text-blue-400 hover:bg-blue-950/70"
+                                onClick={handleEdit}
+                              >
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Editar
+                              </Button>
+                            )}
+
+                            {/* Botão do Trailer */}
+                            {movie.trailerUrl && videoId && (
+                              <Button
+                                variant="outline"
+                                className="w-full bg-red-950/50 border-red-900/50 text-red-400 hover:bg-red-950/70"
+                                onClick={() => setShowTrailer(true)}
+                              >
+                                <Youtube className="h-4 w-4 mr-2" />
+                                Assistir Trailer
+                              </Button>
+                            )}
                           </motion.div>
                         </motion.div>
 
@@ -295,12 +311,6 @@ export function MoviePreviewModal({
                             <Badge variant="outline" className="bg-zinc-800">
                               Estante: {movie.shelfCode}
                             </Badge>
-                            {movie.genres && movie.genres.length > 0 && (
-                              <Badge variant="outline" className="bg-zinc-800 flex items-center gap-1">
-                                <FolderIcon className="h-3 w-3" />
-                                {movie.genres[0].name}
-                              </Badge>
-                            )}
                             {movie.trailerUrl && (
                               <Badge variant="outline" className="bg-red-950/50 border-red-900/50 text-red-400 flex items-center gap-1">
                                 <Youtube className="h-3 w-3" />
@@ -314,6 +324,29 @@ export function MoviePreviewModal({
                               </Badge>
                             )}
                           </motion.div>
+
+                          {/* Gêneros/Categorias */}
+                          {movie.genres && movie.genres.length > 0 && (
+                            <motion.div
+                              initial={{ y: 10, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              transition={{ delay: 0.45 }}
+                            >
+                              <h4 className="text-sm font-medium text-zinc-300 mb-2">Gêneros</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {movie.genres.map((genre) => (
+                                  <Badge 
+                                    key={genre.id} 
+                                    variant="outline" 
+                                    className="bg-zinc-800/50 border-zinc-700 text-zinc-300 flex items-center gap-1"
+                                  >
+                                    <FolderIcon className="h-3 w-3" />
+                                    {genre.name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
 
                           {movie.overview && (
                             <motion.div
