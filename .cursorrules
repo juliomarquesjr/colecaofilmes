@@ -1,4 +1,4 @@
 ## Regras e documentação do projeto
 rules_dir = ".cursor/rules"
 
-# Sempre consulte os arquivos desta pasta para entender regras de negócio, técnicas, padrões de layout, estrutura organizacional e recursos do sistema.
+Sempre consulte os arquivos desta pasta para entender regras de negócio, técnicas, padrões de layout, estrutura organizacional e recursos do sistema.

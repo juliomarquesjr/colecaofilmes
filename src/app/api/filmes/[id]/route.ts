@@ -18,7 +18,7 @@ const filmeSchema = z.object({
   coverUrl: z.string().url('URL da capa inválida'),
   productionInfo: z.string().min(1, 'Informação de produção obrigatória'),
   rating: z.number().min(0).max(10).optional(),
-  genreId: z.number().optional(),
+  genreIds: z.array(z.number()).min(1, 'Selecione pelo menos um gênero'),
   trailerUrl: z.string().url('URL do trailer inválida').optional(),
   runtime: z.number().int().min(1, 'Duração inválida').optional(),
   country: z.string().min(1, 'País de origem obrigatório'),
@@ -94,7 +94,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     const data = await request.json()
     const validatedData = filmeSchema.parse({
       ...data,
-      genreId: data.genreId ? parseInt(data.genreId) : undefined
+      genreIds: Array.isArray(data.genreIds) ? data.genreIds.map((id: any) => parseInt(id as string)) : []
     })
 
     // Atualiza o filme
@@ -117,7 +117,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         originalLanguage: validatedData.originalLanguage,
         genres: {
           set: [], // Remove todos os gêneros existentes
-          connect: validatedData.genreId ? [{ id: validatedData.genreId }] : []
+          connect: validatedData.genreIds.map(id => ({ id }))
         }
       },
       include: {

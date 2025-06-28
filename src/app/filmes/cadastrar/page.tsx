@@ -5,6 +5,7 @@ import { TMDBSearchModal } from '@/components/tmdb-search-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MultiSelect, Option } from '@/components/ui/multi-select';
 import {
     Select,
     SelectContent,
@@ -66,7 +67,7 @@ export default function CadastrarFilme() {
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedGenres, setSelectedGenres] = useState<Option[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [uniqueCode, setUniqueCode] = useState<string>('');
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
@@ -129,8 +130,8 @@ export default function CadastrarFilme() {
         return;
       }
 
-      if (!selectedGenre) {
-        setError('Selecione um gênero');
+      if (selectedGenres.length === 0) {
+        setError('Selecione pelo menos um gênero');
         return;
       }
 
@@ -141,7 +142,7 @@ export default function CadastrarFilme() {
 
       const dataToSend = {
         ...parsed.data,
-        genreId: parseInt(selectedGenre),
+        genreIds: selectedGenres.map(genre => parseInt(genre.value)),
         uniqueCode,
       };
 
@@ -437,33 +438,20 @@ export default function CadastrarFilme() {
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="genre" className="text-zinc-300">
-                          Gênero
-                        </Label>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <Select 
-                              value={selectedGenre} 
-                              onValueChange={setSelectedGenre}
-                            >
-                              <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-indigo-800 focus:border-indigo-800">
-                                <SelectValue placeholder="Selecione o gênero" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-zinc-800 border-zinc-700">
-                                {genres.map((genre) => (
-                                  <SelectItem 
-                                    key={genre.id} 
-                                    value={genre.id.toString()}
-                                    className="text-zinc-100 focus:bg-zinc-700"
-                                  >
-                                    {genre.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="genres">Gêneros</Label>
+                          <div className="flex gap-2">
+                            <div className="flex-1">
+                              <MultiSelect
+                                options={genres.map(genre => ({ value: genre.id.toString(), label: genre.name }))}
+                                selected={selectedGenres}
+                                onChange={setSelectedGenres}
+                                placeholder="Selecione os gêneros..."
+                              />
+                            </div>
+                            <GenreModal onGenreAdded={fetchGenres} />
                           </div>
-                          <GenreModal onGenreAdded={fetchGenres} />
                         </div>
                       </div>
 
