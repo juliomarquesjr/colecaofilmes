@@ -7,6 +7,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não Lançado]
 
+### Corrigido
+- Bug crítico no modal de preview onde botão "Marcar como Assistido" não atualizava visualmente em tempo real
+- Interface do modal agora responde instantaneamente ao toggle do status assistido
+- Sincronização entre estado local e props do componente mantida
+
 ### Adicionado
 - Pesquisa global na base de dados (server-side)
 - Filtro por tipo de mídia (DVD, Blu-ray, VHS)
@@ -25,11 +30,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - UX de loading sem elementos "boiando no nada"
 - Feedback visual durante pesquisa com debounce otimizado
 - Reset automático da página ao mudar filtros
+- Experiência do usuário no modal de preview com feedback visual imediato
 
-### Corrigido
-- Loading overlay aparecendo em lista vazia
-- Pesquisa limitada aos filmes carregados na página
-- Paginação desnecessária quando não há resultados
+### Técnico
+- Correção de inconsistência entre estado local e props em componentes React
+- Implementação de padrão correto para feedback visual imediato em ações do usuário
 
 ## [2024-12-19] - Melhorias na Pesquisa Global com Filtros e Loading
 
