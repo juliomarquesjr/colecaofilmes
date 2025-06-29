@@ -9,6 +9,28 @@ interface MovieStats {
   recentlyWatched: number;
   mediaTypeStats: Record<string, number>;
   yearStats: Array<{ year: number; count: number }>;
+  
+  // Novas estatísticas expandidas
+  genreStats: Array<{ name: string; count: number }>;
+  countryStats: Array<{ country: string; flag: string; count: number }>;
+  languageStats: Array<{ language: string; count: number }>;
+  
+  // Estatísticas de duração
+  runtimeStats: {
+    totalHours: number;
+    totalWatchedHours: number;
+    averageMinutes: number;
+    shortestMinutes: number;
+    longestMinutes: number;
+    moviesWithRuntime: number;
+  };
+  
+  // Distribuição de notas
+  ratingStats: Array<{ range: string; count: number }>;
+  
+  // Padrões de assistir
+  watchingPatternsStats: Array<{ month: string; count: number }>;
+  
   lastUpdated: string;
 }
 
