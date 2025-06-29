@@ -532,436 +532,330 @@ export default function FilmesPage() {
       {/* Paginação - apenas quando há resultados */}
       {totalMovies > 0 && (
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          {/* Informações e Controle de Itens por Página */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="text-sm text-zinc-400">
-              Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, totalMovies)} a{' '}
-              {Math.min(currentPage * itemsPerPage, totalMovies)} de {totalMovies} filmes
-            </div>
-            
-            {/* Barra de progresso visual */}
-            <div className="flex items-center gap-2">
-              <div className="w-32 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                <div 
-                  className={cn(
-                    "h-full rounded-full transition-all duration-300 ease-out",
-                    isPageLoading 
-                      ? "bg-gradient-to-r from-indigo-500 to-purple-500 animate-pulse" 
-                      : "bg-indigo-500"
-                  )}
-                  style={{ 
-                    width: `${(currentPage / Math.ceil(totalMovies / itemsPerPage)) * 100}%` 
-                  }}
-                />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {/* Informações e Controle de Itens por Página */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="text-sm text-zinc-400">
+                Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, totalMovies)} a{' '}
+                {Math.min(currentPage * itemsPerPage, totalMovies)} de {totalMovies} filmes
               </div>
-              <span className={cn(
-                "text-xs transition-colors duration-200",
-                isPageLoading ? "text-indigo-400" : "text-zinc-500"
-              )}>
-                {isPageLoading ? (
-                  <div className="flex items-center gap-1">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    Carregando...
-                  </div>
-                ) : (
-                  `${currentPage}/${Math.ceil(totalMovies / itemsPerPage)}`
-                )}
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-2 text-sm text-zinc-400">
-              Filmes por página:
-              <Select
-                value={itemsPerPage.toString()}
-                onValueChange={handleItemsPerPageChange}
-                disabled={isPageLoading}
-              >
-                <SelectTrigger className={cn(
-                  "w-[80px] h-9 bg-zinc-800/50 border-zinc-700 text-zinc-100 focus-visible:ring-1 focus-visible:ring-indigo-500",
-                  isPageLoading && "opacity-50 cursor-not-allowed"
-                )}>
-                  {isPageLoading && loadingPage === 1 ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <SelectValue />
-                  )}
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
-                  <SelectItem value="12">12</SelectItem>
-                  <SelectItem value="24">24</SelectItem>
-                  <SelectItem value="36">36</SelectItem>
-                  <SelectItem value="48">48</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Controles de Navegação */}
-          {Math.ceil(totalMovies / itemsPerPage) > 1 && (
-            <div className="flex items-center justify-center sm:justify-end">
+              
+              {/* Barra de progresso visual compacta */}
               <div className="flex items-center gap-2">
-                {/* Atalhos rápidos apenas em desktop */}
-                <div className="hidden md:flex items-center gap-1">
-                  {currentPage > 3 && (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigateToPage(1)}
-                        className="h-8 px-2 bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600 text-xs"
-                        title="Ir para a primeira página (Home)"
-                        disabled={isPageLoading || currentPage === 1}
-                      >
-                        {loadingPage === 1 ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          "Primeira"
-                        )}
-                      </Button>
-                      <div className="w-2" />
-                    </>
-                  )}
+                <div className="w-24 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div 
+                    className={cn(
+                      "h-full rounded-full transition-all duration-300 ease-out",
+                      isPageLoading 
+                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 animate-pulse" 
+                        : "bg-indigo-500"
+                    )}
+                    style={{ 
+                      width: `${(currentPage / Math.ceil(totalMovies / itemsPerPage)) * 100}%` 
+                    }}
+                  />
                 </div>
+                <span className={cn(
+                  "text-xs transition-colors duration-200 min-w-[60px]",
+                  isPageLoading ? "text-indigo-400" : "text-zinc-500"
+                )}>
+                  {isPageLoading ? (
+                    <div className="flex items-center gap-1">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span className="text-[10px]">...</span>
+                    </div>
+                  ) : (
+                    `${currentPage}/${Math.ceil(totalMovies / itemsPerPage)}`
+                  )}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-zinc-400">
+                <span className="hidden sm:inline">Por página:</span>
+                <span className="sm:hidden">Itens:</span>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={handleItemsPerPageChange}
+                  disabled={isPageLoading}
+                >
+                  <SelectTrigger className={cn(
+                    "w-[70px] h-8 bg-zinc-800/50 border-zinc-700 text-zinc-100 focus-visible:ring-1 focus-visible:ring-indigo-500",
+                    isPageLoading && "opacity-50 cursor-not-allowed"
+                  )}>
+                    {isPageLoading && loadingPage === 1 ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <SelectValue />
+                    )}
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
+                    <SelectItem value="12">12</SelectItem>
+                    <SelectItem value="24">24</SelectItem>
+                    <SelectItem value="36">36</SelectItem>
+                    <SelectItem value="48">48</SelectItem>
+                    <SelectItem value="60">60</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (currentPage > 1) navigateToPage(currentPage - 1);
-                        }}
-                        className={cn(
-                          "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600",
-                          (currentPage === 1 || isPageLoading) && "pointer-events-none opacity-50"
-                        )}
-                        title="Página anterior (←)"
-                      />
-                    </PaginationItem>
-                    
-                    {/* Páginas */}
-                    {(() => {
-                      const totalPages = Math.ceil(totalMovies / itemsPerPage);
-                      const pages = [];
-                      
-                      // Lógica responsiva: menos páginas em mobile
-                      const maxPagesToShow = isMobile ? 3 : 7;
-                      
-                      if (totalPages <= maxPagesToShow) {
-                        // Mostra todas as páginas se forem poucas
-                        for (let i = 1; i <= totalPages; i++) {
-                          pages.push(
-                            <PaginationItem key={i}>
+            {/* Sistema de Navegação Otimizado */}
+            {Math.ceil(totalMovies / itemsPerPage) > 1 && (
+              <div className="flex items-center justify-center sm:justify-end">
+                {(() => {
+                  const totalPages = Math.ceil(totalMovies / itemsPerPage);
+                  
+                  // Para poucos itens, paginação tradicional simples
+                  if (totalPages <= 5) {
+                    return (
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (currentPage > 1) navigateToPage(currentPage - 1);
+                              }}
+                              className={cn(
+                                "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600",
+                                (currentPage === 1 || isPageLoading) && "pointer-events-none opacity-50"
+                              )}
+                              title="Página anterior (←)"
+                            />
+                          </PaginationItem>
+                          
+                          {/* Renderiza todas as páginas quando são ≤5 */}
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <PaginationItem key={page}>
                               <PaginationLink
                                 href="#"
-                                isActive={currentPage === i}
+                                isActive={currentPage === page}
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  navigateToPage(i);
+                                  navigateToPage(page);
                                 }}
                                 className={cn(
                                   "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600",
-                                  currentPage === i 
+                                  currentPage === page 
                                     ? "bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700 hover:border-indigo-600"
                                     : "text-zinc-100",
                                   isPageLoading && "pointer-events-none",
-                                  loadingPage === i && "opacity-75"
+                                  loadingPage === page && "opacity-75"
                                 )}
                               >
-                                {loadingPage === i ? (
+                                {loadingPage === page ? (
                                   <Loader2 className="h-3 w-3 animate-spin" />
                                 ) : (
-                                  i
+                                  page
+                                )}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+
+                          <PaginationItem>
+                            <PaginationNext
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (currentPage < totalPages) {
+                                  navigateToPage(currentPage + 1);
+                                }
+                              }}
+                              className={cn(
+                                "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600",
+                                (currentPage === totalPages || isPageLoading) && "pointer-events-none opacity-50"
+                              )}
+                              title="Próxima página (→)"
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    );
+                  }
+                  
+                  // Para muitas páginas (>5), usar truncamento inteligente seguindo padrões da comunidade
+                  return (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              if (currentPage > 1) navigateToPage(currentPage - 1);
+                            }}
+                            className={cn(
+                              "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600",
+                              (currentPage === 1 || isPageLoading) && "pointer-events-none opacity-50"
+                            )}
+                            title="Página anterior (←)"
+                          />
+                        </PaginationItem>
+                        
+                        {/* Lógica de truncamento inteligente */}
+                        {(() => {
+                          const pages = [];
+                          
+                          // Sempre mostra a primeira página
+                          pages.push(
+                            <PaginationItem key={1}>
+                              <PaginationLink
+                                href="#"
+                                isActive={currentPage === 1}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  navigateToPage(1);
+                                }}
+                                className={cn(
+                                  "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600",
+                                  currentPage === 1 
+                                    ? "bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700 hover:border-indigo-600"
+                                    : "text-zinc-100",
+                                  isPageLoading && "pointer-events-none",
+                                  loadingPage === 1 && "opacity-75"
+                                )}
+                              >
+                                {loadingPage === 1 ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  1
                                 )}
                               </PaginationLink>
                             </PaginationItem>
                           );
-                        }
-                      } else {
-                        // Lógica para muitas páginas
-                        if (isMobile) {
-                          // Mobile: apenas página atual e adjacentes
-                          if (currentPage > 1) {
+                          
+                          // Elipse inicial se necessário
+                          if (currentPage > 4) {
                             pages.push(
-                              <PaginationItem key={currentPage - 1}>
+                              <PaginationItem key="ellipsis-start">
+                                <span className="flex h-9 w-9 items-center justify-center text-zinc-500">...</span>
+                              </PaginationItem>
+                            );
+                          }
+                          
+                          // Páginas ao redor da atual
+                          const start = Math.max(2, currentPage - 1);
+                          const end = Math.min(totalPages - 1, currentPage + 1);
+                          
+                          for (let i = start; i <= end; i++) {
+                            if (i === 1 || i === totalPages) continue; // Já tratadas separadamente
+                            
+                            pages.push(
+                              <PaginationItem key={i}>
                                 <PaginationLink
                                   href="#"
+                                  isActive={currentPage === i}
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    navigateToPage(currentPage - 1);
+                                    navigateToPage(i);
                                   }}
-                                  className="bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600"
+                                  className={cn(
+                                    "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600",
+                                    currentPage === i 
+                                      ? "bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700 hover:border-indigo-600"
+                                      : "text-zinc-100",
+                                    isPageLoading && "pointer-events-none",
+                                    loadingPage === i && "opacity-75"
+                                  )}
                                 >
-                                  {currentPage - 1}
+                                  {loadingPage === i ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    i
+                                  )}
                                 </PaginationLink>
                               </PaginationItem>
                             );
                           }
                           
-                          pages.push(
-                            <PaginationItem key={currentPage}>
-                              <PaginationLink
-                                href="#"
-                                isActive={true}
-                                className="bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700 hover:border-indigo-600"
-                              >
-                                {currentPage}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                          
-                          if (currentPage < totalPages) {
+                          // Elipse final se necessário
+                          if (currentPage < totalPages - 3) {
                             pages.push(
-                              <PaginationItem key={currentPage + 1}>
-                                <PaginationLink
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    navigateToPage(currentPage + 1);
-                                  }}
-                                  className="bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600"
-                                >
-                                  {currentPage + 1}
-                                </PaginationLink>
+                              <PaginationItem key="ellipsis-end">
+                                <span className="flex h-9 w-9 items-center justify-center text-zinc-500">...</span>
                               </PaginationItem>
                             );
                           }
-                        } else {
-                          // Desktop: lógica completa
-                          if (currentPage <= 4) {
-                            // Início: 1 2 3 4 5 ... última
-                            for (let i = 1; i <= 5; i++) {
-                              pages.push(
-                                <PaginationItem key={i}>
-                                  <PaginationLink
-                                    href="#"
-                                    isActive={currentPage === i}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      navigateToPage(i);
-                                    }}
-                                    className={cn(
-                                      "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600",
-                                      currentPage === i 
-                                        ? "bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700 hover:border-indigo-600"
-                                        : "text-zinc-100",
-                                      isPageLoading && "pointer-events-none",
-                                      loadingPage === i && "opacity-75"
-                                    )}
-                                  >
-                                    {loadingPage === i ? (
-                                      <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                      i
-                                    )}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              );
-                            }
-                            if (totalPages > 6) {
-                              pages.push(
-                                <PaginationItem key="ellipsis1">
-                                  <span className="flex h-9 w-9 items-center justify-center text-zinc-500">...</span>
-                                </PaginationItem>
-                              );
-                              pages.push(
-                                <PaginationItem key={totalPages}>
-                                  <PaginationLink
-                                    href="#"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      navigateToPage(totalPages);
-                                    }}
-                                    className="bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600"
-                                  >
-                                    {totalPages}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              );
-                            }
-                          } else if (currentPage >= totalPages - 3) {
-                            // Final: 1 ... antepenúltima penúltima última
-                            pages.push(
-                              <PaginationItem key={1}>
-                                <PaginationLink
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    navigateToPage(1);
-                                  }}
-                                  className="bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600"
-                                >
-                                  1
-                                </PaginationLink>
-                              </PaginationItem>
-                            );
-                            pages.push(
-                              <PaginationItem key="ellipsis2">
-                                <span className="flex h-9 w-9 items-center justify-center text-zinc-500">...</span>
-                              </PaginationItem>
-                            );
-                            for (let i = totalPages - 4; i <= totalPages; i++) {
-                              pages.push(
-                                <PaginationItem key={i}>
-                                  <PaginationLink
-                                    href="#"
-                                    isActive={currentPage === i}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      navigateToPage(i);
-                                    }}
-                                    className={cn(
-                                      "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600",
-                                      currentPage === i 
-                                        ? "bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700 hover:border-indigo-600"
-                                        : "text-zinc-100",
-                                      isPageLoading && "pointer-events-none",
-                                      loadingPage === i && "opacity-75"
-                                    )}
-                                  >
-                                    {loadingPage === i ? (
-                                      <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                      i
-                                    )}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              );
-                            }
-                          } else {
-                            // Meio: 1 ... atual-1 atual atual+1 ... última
-                            pages.push(
-                              <PaginationItem key={1}>
-                                <PaginationLink
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    navigateToPage(1);
-                                  }}
-                                  className="bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600"
-                                >
-                                  1
-                                </PaginationLink>
-                              </PaginationItem>
-                            );
-                            pages.push(
-                              <PaginationItem key="ellipsis3">
-                                <span className="flex h-9 w-9 items-center justify-center text-zinc-500">...</span>
-                              </PaginationItem>
-                            );
-                            for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-                              pages.push(
-                                <PaginationItem key={i}>
-                                  <PaginationLink
-                                    href="#"
-                                    isActive={currentPage === i}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      navigateToPage(i);
-                                    }}
-                                    className={cn(
-                                      "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600",
-                                      currentPage === i 
-                                        ? "bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700 hover:border-indigo-600"
-                                        : "text-zinc-100",
-                                      isPageLoading && "pointer-events-none",
-                                      loadingPage === i && "opacity-75"
-                                    )}
-                                  >
-                                    {loadingPage === i ? (
-                                      <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                      i
-                                    )}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              );
-                            }
-                            pages.push(
-                              <PaginationItem key="ellipsis4">
-                                <span className="flex h-9 w-9 items-center justify-center text-zinc-500">...</span>
-                              </PaginationItem>
-                            );
+                          
+                          // Sempre mostra a última página (se não for a primeira)
+                          if (totalPages > 1) {
                             pages.push(
                               <PaginationItem key={totalPages}>
                                 <PaginationLink
                                   href="#"
+                                  isActive={currentPage === totalPages}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     navigateToPage(totalPages);
                                   }}
-                                  className="bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600"
+                                  className={cn(
+                                    "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600",
+                                    currentPage === totalPages 
+                                      ? "bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700 hover:border-indigo-600"
+                                      : "text-zinc-100",
+                                    isPageLoading && "pointer-events-none",
+                                    loadingPage === totalPages && "opacity-75"
+                                  )}
                                 >
-                                  {totalPages}
+                                  {loadingPage === totalPages ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    totalPages
+                                  )}
                                 </PaginationLink>
                               </PaginationItem>
                             );
                           }
-                        }
-                      }
-                      
-                      return pages;
-                    })()}
+                          
+                          return pages;
+                        })()}
 
-                    <PaginationItem>
-                      <PaginationNext
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (currentPage < Math.ceil(totalMovies / itemsPerPage)) {
-                            navigateToPage(currentPage + 1);
-                          }
-                        }}
-                        className={cn(
-                          "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600",
-                          (currentPage === Math.ceil(totalMovies / itemsPerPage) || isPageLoading) && "pointer-events-none opacity-50"
-                        )}
-                        title="Próxima página (→)"
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-
-                {/* Atalhos rápidos apenas em desktop */}
-                <div className="hidden md:flex items-center gap-1">
-                  {currentPage < Math.ceil(totalMovies / itemsPerPage) - 2 && (
-                    <>
-                      <div className="w-2" />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigateToPage(Math.ceil(totalMovies / itemsPerPage))}
-                        className="h-8 px-2 bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600 text-xs"
-                        title="Ir para a última página (End)"
-                        disabled={isPageLoading || currentPage === Math.ceil(totalMovies / itemsPerPage)}
-                      >
-                        {loadingPage === Math.ceil(totalMovies / itemsPerPage) ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          "Última"
-                        )}
-                      </Button>
-                    </>
-                  )}
-                </div>
+                        <PaginationItem>
+                          <PaginationNext
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              if (currentPage < totalPages) {
+                                navigateToPage(currentPage + 1);
+                              }
+                            }}
+                            className={cn(
+                              "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:border-zinc-600",
+                              (currentPage === totalPages || isPageLoading) && "pointer-events-none opacity-50"
+                            )}
+                            title="Próxima página (→)"
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  );
+                })()}
               </div>
-            </div>
-          )}
-        </div>
-        
-          {/* Dica sobre atalhos de teclado */}
-          {Math.ceil(totalMovies / itemsPerPage) > 1 && (
-            <div className="mt-3 pt-3 border-t border-zinc-800">
-              <div className={cn(
-                "flex items-center justify-center text-xs transition-colors duration-300",
-                keyboardNavigation ? "text-indigo-400" : "text-zinc-500"
-              )}>
-                💡 Use as setas ← → para navegar, Home/End para primeira/última página
-              </div>
-            </div>
-          )}
+            )}
+          </div>
+          
+                     {/* Dicas de navegação contextuais */}
+           {Math.ceil(totalMovies / itemsPerPage) > 1 && (
+             <div className="mt-3 pt-3 border-t border-zinc-800">
+               <div className={cn(
+                 "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs transition-colors duration-300",
+                 keyboardNavigation ? "text-indigo-400" : "text-zinc-500"
+               )}>
+                 <div className="flex items-center gap-4">
+                   <span>💡 Teclado: ← → (páginas) | Home/End (início/fim)</span>
+                   {Math.ceil(totalMovies / itemsPerPage) > 5 && (
+                     <span className="hidden sm:inline">✨ Navegação otimizada com elipses (...)</span>
+                   )}
+                 </div>
+                 {Math.ceil(totalMovies / itemsPerPage) > 20 && (
+                   <div className="text-amber-400">
+                     <span>⚡ {Math.ceil(totalMovies / itemsPerPage)} páginas - considere filtrar para melhor navegação</span>
+                   </div>
+                 )}
+               </div>
+             </div>
+           )}
         </div>
       )}
 

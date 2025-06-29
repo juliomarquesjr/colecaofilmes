@@ -1,4 +1,14 @@
 ## Regras e documentação do projeto
 rules_dir = ".cursor/rules"
+timeline_dir = ".cursor/timeline"
+changelog_file = ".cursor/CHANGELOG.md"
 
+## Timeline de tarefas realizadas
+Ao final de cada tarefa, adicione um arquivo de contexto com dentro do diretorio timeline.
+Seguindo o mesmo padrão dos arquivos ja existentes.
+
+## Changelog
+Ao final de cada tarefa concluida, sera necessario atualizar o arquivo CHANGELOG.md
+
+## Informacoes gerais
 Sempre consulte os arquivos desta pasta para entender regras de negócio, técnicas, padrões de layout, estrutura organizacional e recursos do sistema.
