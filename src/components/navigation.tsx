@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { FilmIcon, LogOutIcon, UserIcon, Users } from "lucide-react";
+import { BarChart3, FilmIcon, LogOutIcon, UserIcon, Users } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -62,6 +62,20 @@ export function Navigation() {
                 >
                   <FilmIcon className="h-4 w-4 mr-2" />
                   Filmes
+                </Button>
+              </Link>
+              
+              <Link href="/estatisticas">
+                <Button
+                  variant="ghost"
+                  className={`px-4 ${
+                    isActive("/estatisticas")
+                      ? "bg-zinc-800/80 text-white"
+                      : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                  }`}
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Estatísticas
                 </Button>
               </Link>
               

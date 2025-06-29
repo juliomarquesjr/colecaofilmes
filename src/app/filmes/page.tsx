@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useMovieStats } from "@/hooks/use-movie-stats"
 import { cn } from "@/lib/utils"
 import { Dice1, Loader2, Plus, Search } from "lucide-react"
 import Link from "next/link"
@@ -55,6 +56,10 @@ interface MovieWithGenres {
 
 export default function FilmesPage() {
   const router = useRouter()
+  
+  // Hook para estatísticas dos filmes
+  const { stats, isLoading: isStatsLoading, error: statsError, refetch: refetchStats } = useMovieStats()
+  
   const [movies, setMovies] = useState<MovieWithGenres[]>([])
   const [filteredMovies, setFilteredMovies] = useState<MovieWithGenres[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -73,15 +78,13 @@ export default function FilmesPage() {
   const [isPageLoading, setIsPageLoading] = useState(false)
   const [loadingPage, setLoadingPage] = useState<number | null>(null)
   const [isSearchLoading, setIsSearchLoading] = useState(false)
+  const [showExtendedStats, setShowExtendedStats] = useState(false)
 
   // Debounce da pesquisa para evitar muitas requisições
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
   // Obtém os anos únicos dos filmes
   const availableYears = [...new Set(movies.map(movie => movie.year))].sort((a, b) => b - a)
-
-  // Calcula o total de filmes assistidos
-  const watchedMovies = movies.filter(movie => movie.watchedAt).length
 
   useEffect(() => {
     // Detecta se é mobile
@@ -99,6 +102,13 @@ export default function FilmesPage() {
     loadMovies()
     loadGenres()
   }, [currentPage, itemsPerPage, debouncedSearchTerm, selectedGenre, selectedYear, selectedRating, selectedMediaType])
+
+  // Exibe erro se houver problema ao carregar estatísticas
+  useEffect(() => {
+    if (statsError) {
+      toast.error("Erro ao carregar estatísticas dos filmes")
+    }
+  }, [statsError])
 
   // Reset página quando pesquisa mudar
   useEffect(() => {
@@ -210,8 +220,6 @@ export default function FilmesPage() {
     }
   }
 
-
-
   const navigateToPage = async (page: number) => {
     if (page === currentPage || isPageLoading) return
     
@@ -268,6 +276,10 @@ export default function FilmesPage() {
       const res = await fetch(`/api/filmes/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Erro ao excluir filme")
       setMovies((prev) => prev.filter((movie) => movie.id !== id))
+      
+      // Recarrega as estatísticas após excluir filme
+      refetchStats();
+      
       toast.success("Filme excluído com sucesso")
     } catch (error) {
       console.error("Erro ao excluir filme:", error)
@@ -296,6 +308,9 @@ export default function FilmesPage() {
           movie.id === id ? { ...movie, watchedAt: updatedMovie.watchedAt } : movie
         )
       );
+      
+      // Recarrega as estatísticas após marcar/desmarcar filme como assistido
+      refetchStats();
     } catch (error) {
       console.error('Erro ao atualizar status do filme:', error);
       toast.error('Erro ao atualizar status do filme');
@@ -371,8 +386,10 @@ export default function FilmesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <MovieStats
-            totalMovies={movies.length}
-            watchedMovies={watchedMovies}
+            totalMovies={stats?.totalMovies}
+            watchedMovies={stats?.watchedMovies}
+            watchedPercentage={stats?.watchedPercentage}
+            isLoading={isStatsLoading}
             compact
           />
         </div>
@@ -398,12 +415,6 @@ export default function FilmesPage() {
           </Link>
         </div>
       </div>
-
-      {/* Estatísticas Detalhadas */}
-      <MovieStats
-        totalMovies={movies.length}
-        watchedMovies={watchedMovies}
-      />
 
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
         {/* Barra de Pesquisa */}
@@ -488,8 +499,8 @@ export default function FilmesPage() {
                 onEdit={(id) => router.push(`/filmes/${id}/editar`)}
                 onDelete={handleDelete}
                 onWatchedToggle={handleWatchedToggle}
-                totalMovies={movies.length}
-                watchedMovies={watchedMovies}
+                totalMovies={stats?.totalMovies || 0}
+                watchedMovies={stats?.watchedMovies || 0}
               />
             ))}
           </div>
