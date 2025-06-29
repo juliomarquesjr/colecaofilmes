@@ -7,34 +7,94 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não Lançado]
 
+### Adicionado
+- **Página de Estatísticas Completa** (`/estatisticas`) com análise detalhada da coleção
+- **Endpoint de Estatísticas** (`/api/filmes/stats`) otimizado com consultas paralelas
+- **6 Cards de Visão Geral**: Total, Assistidos, Top Rated, Recentes, Top Ano, Mídia Favorita
+- **Gráficos de Distribuição**: Por tipo de mídia e anos com barras de progresso animadas
+- **Seção de Insights**: 6 análises inteligentes com mensagens contextuais
+- **Hook personalizado** `useMovieStats` para gerenciamento de estado das estatísticas
+- **Componente ProgressBar** reutilizável com animações Framer Motion
+- **Navegação integrada** com link "Estatísticas" no menu principal e botão na página de filmes
+
+### Alterado
+- **Cards da página principal** agora alimentados por dados precisos do endpoint (não mais cálculo local)
+- **Componente MovieStats** atualizado com suporte a dados do endpoint e skeleton de carregamento
+- **Navegação principal** expandida com novo link para estatísticas
+
+### Melhorado
+- **Performance das estatísticas** com consultas otimizadas no banco de dados
+- **Precisão dos dados** considerando toda a coleção (não apenas página atual)
+- **Experiência do usuário** com loading states, animações e feedback visual
+- **Responsividade** com grid adaptativo (2→3→6 colunas)
+
+### Técnico
+- Implementação de `prisma.$transaction()` para consultas paralelas otimizadas
+- Uso de `groupBy()` para agregações eficientes no banco
+- Componentes com animações escalonadas e cores temáticas
+- Atualização automática das estatísticas após ações do usuário
+
 ### Corrigido
 - Bug crítico no modal de preview onde botão "Marcar como Assistido" não atualizava visualmente em tempo real
 - Interface do modal agora responde instantaneamente ao toggle do status assistido
 - Sincronização entre estado local e props do componente mantida
 
-### Adicionado
+### Adicionado (Anteriormente)
 - Pesquisa global na base de dados (server-side)
 - Filtro por tipo de mídia (DVD, Blu-ray, VHS)
 - Sistema de loading inteligente e contextual
 - Estado vazio com mensagens e ações contextuais
 - Documentação completa das melhorias na pesquisa
 
-### Alterado
+### Alterado (Anteriormente)
 - Migração de filtro local para pesquisa server-side
 - API de filmes atualizada com múltiplos filtros
 - Estados de loading diferenciados (pesquisa vs paginação)
 - Paginação condicional (só aparece quando há resultados)
 
-### Melhorado
+### Melhorado (Anteriormente)
 - Performance da pesquisa com filtros server-side
 - UX de loading sem elementos "boiando no nada"
 - Feedback visual durante pesquisa com debounce otimizado
 - Reset automático da página ao mudar filtros
 - Experiência do usuário no modal de preview com feedback visual imediato
 
-### Técnico
+### Técnico (Anteriormente)
 - Correção de inconsistência entre estado local e props em componentes React
 - Implementação de padrão correto para feedback visual imediato em ações do usuário
+
+## [2024-12-28] - Sistema de Estatísticas Completo
+
+### Adicionado
+- Nova página dedicada de estatísticas (`/estatisticas`) com análise completa da coleção
+- Endpoint otimizado `/api/filmes/stats` com consultas paralelas no banco de dados
+- 6 cards principais: Total, Assistidos, Top Rated, Recentes, Top Ano, Mídia Favorita
+- Gráficos de distribuição por tipo de mídia e anos com barras de progresso animadas
+- Seção de insights com 6 análises inteligentes e mensagens contextuais
+- Hook personalizado `useMovieStats` para gerenciamento de estado
+- Componente `ProgressBar` reutilizável com animações Framer Motion
+- Componente `MovieStatsExtended` com 6 cards temáticos e animações escalonadas
+- Navegação integrada com link no menu principal e botão na página de filmes
+
+### Alterado
+- Cards da página principal agora alimentados por dados precisos do endpoint
+- Componente `MovieStats` atualizado com suporte a dados do endpoint
+- Navegação principal expandida com link para estatísticas
+- Remoção do cálculo local de estatísticas em favor do endpoint
+
+### Melhorado
+- Performance com consultas otimizadas usando `prisma.$transaction()`
+- Precisão dos dados considerando toda a coleção, não apenas página atual
+- Experiência do usuário com loading states elegantes e animações suaves
+- Responsividade com grid adaptativo (2→3→6 colunas)
+- Design com cores temáticas e gradientes personalizados
+
+### Técnico
+- Implementação de consultas paralelas com `prisma.$transaction()`
+- Uso de `groupBy()` para agregações eficientes
+- Componentes com animações escalonadas usando Framer Motion
+- Atualização automática das estatísticas após ações do usuário
+- TypeScript interfaces completas para tipagem de dados
 
 ## [2024-12-19] - Melhorias na Pesquisa Global com Filtros e Loading
 

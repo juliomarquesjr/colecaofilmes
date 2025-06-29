@@ -2,17 +2,79 @@ import { motion } from "framer-motion";
 import { CheckCircle2Icon, FilmIcon } from "lucide-react";
 
 interface MovieStatsProps {
-  totalMovies: number;
-  watchedMovies: number;
+  totalMovies?: number;
+  watchedMovies?: number;
+  watchedPercentage?: number;
   compact?: boolean;
+  isLoading?: boolean;
 }
 
-export function MovieStats({ totalMovies, watchedMovies, compact = false }: MovieStatsProps) {
-  const watchedPercentage = totalMovies > 0 
+export function MovieStats({ 
+  totalMovies = 0, 
+  watchedMovies = 0, 
+  watchedPercentage: providedPercentage,
+  compact = false,
+  isLoading = false 
+}: MovieStatsProps) {
+  // Usa a porcentagem fornecida ou calcula se não fornecida
+  const watchedPercentage = providedPercentage ?? (totalMovies > 0 
     ? Math.round((watchedMovies / totalMovies) * 100) 
-    : 0;
+    : 0);
 
   const isComplete = watchedPercentage === 100;
+
+  // Skeleton de carregamento para versão compacta
+  if (isLoading && compact) {
+    return (
+      <div className="flex items-center gap-3">
+        {/* Skeleton Total de Filmes */}
+        <div className="bg-zinc-800/50 rounded-lg border border-zinc-700 p-3 w-[140px] animate-pulse">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-zinc-700/50 border border-zinc-600/50">
+                <div className="h-4 w-4 bg-zinc-600/50 rounded" />
+              </div>
+              <div className="h-3 w-8 bg-zinc-600/50 rounded" />
+            </div>
+            <div className="flex items-end justify-between">
+              <div className="h-8 w-12 bg-zinc-600/50 rounded" />
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Filmes Assistidos */}
+        <div className="bg-zinc-800/50 rounded-lg border border-zinc-700 p-3 w-[140px] animate-pulse">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-zinc-700/50 border border-zinc-600/50">
+                <div className="h-4 w-4 bg-zinc-600/50 rounded" />
+              </div>
+              <div className="h-3 w-16 bg-zinc-600/50 rounded" />
+            </div>
+            <div className="flex items-end justify-between">
+              <div className="h-8 w-12 bg-zinc-600/50 rounded" />
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Progresso */}
+        <div className="bg-zinc-800/50 rounded-lg border border-zinc-700 p-3 w-[140px] animate-pulse">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-zinc-700/50 border border-zinc-600/50">
+                <div className="h-4 w-4 bg-zinc-600/50 rounded-full" />
+              </div>
+              <div className="h-3 w-14 bg-zinc-600/50 rounded" />
+            </div>
+            <div className="flex items-end justify-between">
+              <div className="h-8 w-12 bg-zinc-600/50 rounded" />
+              <div className="h-1 w-full flex-1 bg-zinc-700/50 rounded-full ml-3" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (compact) {
     return (
