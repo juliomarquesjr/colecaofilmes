@@ -8,6 +8,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ## [Não Lançado]
 
 ### Adicionado
+- **Botão de Visualização de Senha** no formulário de login para melhor usabilidade
+
+### Anterior
+
+### Adicionado
 - **Análise Completa de Estatísticas** com 100% dos dados disponíveis utilizados
 - **12 Tipos de Gráficos Modernos Interativos** usando biblioteca Recharts
 - **Análise por Gêneros** com gráfico de barras verticais (top 8 gêneros) ✅ CORRIGIDO
@@ -316,4 +321,4 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - **Corrigido** para correções de bugs
 - **Segurança** para vulnerabilidades corrigidas
 - **Melhorado** para aprimoramentos de UX/UI
-- **Técnico** para mudanças técnicas internas 
+- **Técnico** para mudanças técnicas internas
