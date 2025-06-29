@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowLeft, Clapperboard, Film, Star } from "lucide-react"
+import { ArrowLeft, Clapperboard, Film, Loader2, Star } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useState } from "react"
@@ -34,7 +34,11 @@ export default function RouletteMoviePage() {
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-zinc-900 to-indigo-900 p-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">Carregando...</h1>
+          <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            <Loader2 className="h-12 w-12 animate-spin text-indigo-500 mb-4" />
+            <h1 className="text-2xl font-bold text-white mb-2">Carregando Roleta...</h1>
+            <p className="text-zinc-400">Preparando seus filmes para o sorteio</p>
+          </div>
         </div>
       </div>
     }>
@@ -45,32 +49,67 @@ export default function RouletteMoviePage() {
 
 function RouletteContent() {
   const searchParams = useSearchParams()
-  const selectedGenres = searchParams.getAll("genres").map(Number)
+  const selectedGenres = searchParams.getAll("genres").map(Number).filter(id => !isNaN(id))
   
   const [movies, setMovies] = useState<Movie[]>([])
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const [isSpinning, setIsSpinning] = useState(false)
   const [showResult, setShowResult] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadUnwatchedMovies()
-  }, [])
+  }, []) // Remover selectedGenres da dependência para evitar loop
 
   async function loadUnwatchedMovies() {
     try {
-      const res = await fetch("/api/filmes?unwatched=true")
+      setIsLoading(true)
+      setError(null)
+      
+      console.log('Carregando filmes não assistidos...')
+      console.log('Gêneros selecionados:', selectedGenres)
+      
+      // Primeiro, vamos buscar o total para definir um limite adequado
+      const res = await fetch("/api/filmes?unwatched=true&limit=1000")
       if (!res.ok) throw new Error("Erro ao carregar filmes")
-      const allMovies = await res.json()
+      const data = await res.json()
       
-      // Filtra por gêneros selecionados
-      const filteredMovies = allMovies.filter((movie: Movie) =>
-        movie.genres.some(genre => selectedGenres.includes(genre.id))
-      )
+      // A API retorna { movies, totalMovies }, então pegamos apenas movies
+      const allMovies = data.movies || []
+      const totalMovies = data.totalMovies || 0
       
+      console.log(`Total de filmes não assistidos disponíveis: ${totalMovies}`)
+      console.log(`Filmes carregados na primeira requisição: ${allMovies.length}`)
+      
+      // Se temos menos filmes carregados do que o total, significa que precisamos buscar mais
+      let finalMovies = allMovies
+      if (allMovies.length < totalMovies) {
+        console.log('Buscando todos os filmes sem limite de paginação...')
+        const allRes = await fetch(`/api/filmes?unwatched=true&limit=${totalMovies}`)
+        if (allRes.ok) {
+          const allData = await allRes.json()
+          finalMovies = allData.movies || []
+          console.log(`Total de filmes carregados após segunda requisição: ${finalMovies.length}`)
+        }
+      }
+      
+      // Filtra por gêneros selecionados (se houver gêneros selecionados)
+      const filteredMovies = selectedGenres.length > 0 
+        ? finalMovies.filter((movie: Movie) =>
+            movie.genres.some(genre => selectedGenres.includes(genre.id))
+          )
+        : finalMovies
+      
+      console.log(`Filmes filtrados por gênero: ${filteredMovies.length}`)
       setMovies(filteredMovies)
+      
     } catch (error) {
       console.error("Erro ao carregar filmes:", error)
+      setError("Erro ao carregar filmes para o sorteio")
       toast.error("Erro ao carregar filmes")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -129,6 +168,72 @@ function RouletteContent() {
     }
   }
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-zinc-900 to-indigo-900 p-8">
+        <div className="mx-auto max-w-4xl">
+          <Link href="/filmes" className="inline-flex items-center text-zinc-400 hover:text-white mb-8">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar para lista
+          </Link>
+
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-white mb-4">🎲 Roleta de Filmes</h1>
+            <p className="text-xl text-zinc-400">
+              Deixe a sorte escolher seu próximo filme!
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <Loader2 className="h-16 w-16 animate-spin text-indigo-500 mb-6" />
+            <h2 className="text-2xl font-bold text-white mb-2">Carregando filmes...</h2>
+            <p className="text-zinc-400 mb-4">Buscando filmes não assistidos na sua coleção</p>
+            {selectedGenres.length > 0 && (
+              <p className="text-sm text-zinc-500">
+                Filtrando por {selectedGenres.length} gênero{selectedGenres.length !== 1 ? 's' : ''} selecionado{selectedGenres.length !== 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-zinc-900 to-indigo-900 p-8">
+        <div className="mx-auto max-w-4xl">
+          <Link href="/filmes" className="inline-flex items-center text-zinc-400 hover:text-white mb-8">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar para lista
+          </Link>
+
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-white mb-4">🎲 Roleta de Filmes</h1>
+            <p className="text-xl text-zinc-400">
+              Deixe a sorte escolher seu próximo filme!
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-bold text-white mb-2">Erro ao carregar filmes</h2>
+            <p className="text-zinc-400 mb-6">{error}</p>
+            <Button
+              onClick={loadUnwatchedMovies}
+              variant="outline"
+              className="bg-zinc-800/50 border-zinc-700 text-white hover:bg-zinc-800 hover:text-white"
+            >
+              Tentar Novamente
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-zinc-900 to-indigo-900 p-8">
       <div className="mx-auto max-w-4xl">
@@ -153,14 +258,57 @@ function RouletteContent() {
                 exit={{ opacity: 0, y: -20 }}
                 className="text-center"
               >
-                <Button
-                  onClick={spinRoulette}
-                  size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-xl px-8 py-6"
-                >
-                  <Clapperboard className="mr-2 h-6 w-6" />
-                  Girar a Roleta!
-                </Button>
+                {movies.length > 0 ? (
+                  <div className="space-y-4">
+                    <p className="text-zinc-400 mb-4">
+                      {movies.length} filme{movies.length !== 1 ? 's' : ''} disponível{movies.length !== 1 ? 'eis' : ''} para sorteio
+                    </p>
+                    {selectedGenres.length > 0 && (
+                      <p className="text-sm text-zinc-500 mb-4">
+                        Filtrados por {selectedGenres.length} gênero{selectedGenres.length !== 1 ? 's' : ''} selecionado{selectedGenres.length !== 1 ? 's' : ''}
+                      </p>
+                    )}
+                    <Button
+                      onClick={spinRoulette}
+                      size="lg"
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-xl px-8 py-6"
+                    >
+                      <Clapperboard className="mr-2 h-6 w-6" />
+                      Girar a Roleta!
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="text-6xl mb-4">🎬</div>
+                    <h3 className="text-xl font-medium text-white mb-2">
+                      Nenhum filme disponível para sorteio
+                    </h3>
+                    <p className="text-zinc-400 text-center max-w-md mx-auto mb-6">
+                      {selectedGenres.length > 0 
+                        ? "Não há filmes não assistidos nos gêneros selecionados. Tente selecionar outros gêneros ou adicione mais filmes à sua coleção."
+                        : "Não há filmes não assistidos na sua coleção ou todos os gêneros foram desmarcados."
+                      }
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                      <Button
+                        onClick={loadUnwatchedMovies}
+                        variant="outline"
+                        className="bg-zinc-800/50 border-zinc-700 text-white hover:bg-zinc-800 hover:text-white"
+                      >
+                        Recarregar
+                      </Button>
+                      <Link href="/filmes">
+                        <Button
+                          variant="outline"
+                          className="bg-zinc-800/50 border-zinc-700 text-white hover:bg-zinc-800 hover:text-white"
+                        >
+                          <ArrowLeft className="mr-2 h-4 w-4" />
+                          Voltar para Filmes
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 

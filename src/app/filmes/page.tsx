@@ -3,7 +3,6 @@
 import { GenreManagementModal } from "@/components/genre-management-modal"
 import { MovieCard } from "@/components/movie-card"
 import { MovieFilters } from "@/components/movie-filters"
-import { MovieRouletteModal } from "@/components/movie-roulette-modal"
 import { MovieStats } from "@/components/movie-stats"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,7 +25,7 @@ import { Separator } from "@/components/ui/separator"
 import { useDebounce } from "@/hooks/use-debounce"
 import { useMovieStats } from "@/hooks/use-movie-stats"
 import { cn } from "@/lib/utils"
-import { Dice1, Loader2, Plus, Search } from "lucide-react"
+import { Loader2, Plus, Search } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -69,7 +68,6 @@ export default function FilmesPage() {
   const [selectedYear, setSelectedYear] = useState("all")
   const [selectedRating, setSelectedRating] = useState("all")
   const [selectedMediaType, setSelectedMediaType] = useState("all")
-  const [isRouletteOpen, setIsRouletteOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(12)
   const [totalMovies, setTotalMovies] = useState(0)
@@ -395,14 +393,6 @@ export default function FilmesPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setIsRouletteOpen(true)}
-            variant="outline"
-            className="bg-zinc-800/50 border-zinc-700 text-white hover:bg-zinc-800 hover:text-white"
-          >
-            <Dice1 className="mr-2 h-4 w-4" />
-            Sorteio
-          </Button>
           <GenreManagementModal
             genres={genres}
             onGenresChange={setGenres}
@@ -975,11 +965,6 @@ export default function FilmesPage() {
         </div>
       )}
 
-      <MovieRouletteModal
-        genres={genres}
-        open={isRouletteOpen}
-        onOpenChange={setIsRouletteOpen}
-      />
     </div>
   )
 } 

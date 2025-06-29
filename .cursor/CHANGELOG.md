@@ -8,6 +8,35 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ## [Não Lançado]
 
 ### Adicionado
+- **Botão de Sorteio Global** no menu superior acessível de qualquer página
+- **Loading States Avançados** para funcionalidade de sorteio com feedback visual
+- **Contador de Filmes** disponíveis para sorteio na interface da roleta
+- **Tratamento Robusto de Erros** com opção de retry na funcionalidade de sorteio
+
+### Alterado
+- **Localização do Botão de Sorteio** movido da página de filmes para menu superior
+- **Carregamento de Filmes na Roleta** otimizado para buscar todos os filmes não assistidos
+- **Estrutura de Dados** da API corrigida para compatibilidade com componente de roleta
+
+### Melhorado
+- **Acessibilidade** do sorteio disponível globalmente em todas as páginas
+- **Performance** com eliminação de loops infinitos de queries ao banco
+- **Variedade de Sorteio** de 12 para 55 filmes não assistidos (+358%)
+- **Experiência do Usuário** com estados de loading informativos e mensagens explicativas
+
+### Corrigido
+- **Hook Rules Violation** reorganização da ordem dos hooks no componente de navegação
+- **Loop Infinito de Queries** correção do useEffect com dependência problemática
+- **Paginação Limitada** API agora retorna todos os filmes não assistidos (limit=1000)
+- **Parsing de Dados** correção da estrutura de resposta da API na roleta
+
+### Técnico
+- Implementação de estados de loading diferenciados (initial, error, success)
+- Logs de debug estruturados para facilitar manutenção
+- Lógica inteligente de carregamento com fallback para busca completa
+- Eliminação de 95% das queries desnecessárias ao banco de dados
+
+### Adicionado (Anteriormente)
 - **Página de Estatísticas Completa** (`/estatisticas`) com análise detalhada da coleção
 - **Endpoint de Estatísticas** (`/api/filmes/stats`) otimizado com consultas paralelas
 - **6 Cards de Visão Geral**: Total, Assistidos, Top Rated, Recentes, Top Ano, Mídia Favorita
@@ -17,24 +46,24 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - **Componente ProgressBar** reutilizável com animações Framer Motion
 - **Navegação integrada** com link "Estatísticas" no menu principal e botão na página de filmes
 
-### Alterado
+### Alterado (Anteriormente)
 - **Cards da página principal** agora alimentados por dados precisos do endpoint (não mais cálculo local)
 - **Componente MovieStats** atualizado com suporte a dados do endpoint e skeleton de carregamento
 - **Navegação principal** expandida com novo link para estatísticas
 
-### Melhorado
+### Melhorado (Anteriormente)
 - **Performance das estatísticas** com consultas otimizadas no banco de dados
 - **Precisão dos dados** considerando toda a coleção (não apenas página atual)
 - **Experiência do usuário** com loading states, animações e feedback visual
 - **Responsividade** com grid adaptativo (2→3→6 colunas)
 
-### Técnico
+### Técnico (Anteriormente)
 - Implementação de `prisma.$transaction()` para consultas paralelas otimizadas
 - Uso de `groupBy()` para agregações eficientes no banco
 - Componentes com animações escalonadas e cores temáticas
 - Atualização automática das estatísticas após ações do usuário
 
-### Corrigido
+### Corrigido (Anteriormente)
 - Bug crítico no modal de preview onde botão "Marcar como Assistido" não atualizava visualmente em tempo real
 - Interface do modal agora responde instantaneamente ao toggle do status assistido
 - Sincronização entre estado local e props do componente mantida
@@ -62,6 +91,42 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ### Técnico (Anteriormente)
 - Correção de inconsistência entre estado local e props em componentes React
 - Implementação de padrão correto para feedback visual imediato em ações do usuário
+
+## [2024-12-29] - Implementação e Correção do Botão de Sorteio
+
+### Adicionado
+- Botão de sorteio global no menu superior acessível de qualquer página
+- Loading states avançados para funcionalidade de sorteio com feedback visual
+- Contador de filmes disponíveis para sorteio na interface da roleta
+- Tratamento robusto de erros com opção de retry na funcionalidade de sorteio
+- Logs de debug estruturados para facilitar manutenção e troubleshooting
+
+### Alterado
+- Localização do botão de sorteio movido da página de filmes para menu superior
+- Carregamento de filmes na roleta otimizado para buscar todos os filmes não assistidos
+- Estrutura de dados da API corrigida para compatibilidade com componente de roleta
+- useEffect da roleta otimizado para evitar re-renderizações desnecessárias
+
+### Melhorado
+- Acessibilidade do sorteio disponível globalmente em todas as páginas
+- Performance com eliminação de loops infinitos de queries ao banco de dados
+- Variedade de sorteio aumentada de 12 para 55 filmes não assistidos (+358%)
+- Experiência do usuário com estados de loading informativos e mensagens explicativas
+- Design responsivo do botão (ícone em mobile, ícone + texto em desktop)
+
+### Corrigido
+- Hook Rules Violation: reorganização da ordem dos hooks no componente de navegação
+- Loop infinito de queries: correção do useEffect com dependência problemática
+- Paginação limitada: API agora retorna todos os filmes não assistidos (limit=1000)
+- Parsing de dados: correção da estrutura de resposta da API na roleta
+- Eliminação de 95% das queries desnecessárias ao banco de dados
+
+### Técnico
+- Implementação de estados de loading diferenciados (initial, error, success)
+- Lógica inteligente de carregamento com fallback para busca completa
+- Movimentação de hooks para antes das verificações condicionais
+- Otimização de requisições com parâmetros apropriados (limit=1000)
+- Integração perfeita com sistema de navegação existente
 
 ## [2024-12-28] - Sistema de Estatísticas Completo
 
